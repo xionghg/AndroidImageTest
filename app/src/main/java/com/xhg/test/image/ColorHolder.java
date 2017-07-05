@@ -60,12 +60,12 @@ public class ColorHolder {
             }
             int total = params[0];
             int current = params[1];
-            for (int i = 0; i < mHeight; i++) {
-                for (int j = 0; j < mWidth; j++) {
+            for (int j = 0; j < mHeight; j++) {
+                for (int i = 0; i < mWidth; i++) {
                     int r = mStrategy.getRed(i, j) % 256;
                     int g = mStrategy.getGreen(i, j) % 256;
                     int b = mStrategy.getBlue(i, j) % 256;
-                    mColorArray[i * mWidth + j] = mAlpha | r | g | b;
+                    mColorArray[j * mWidth + i] = mAlpha | r | g | b;
                 }
             }
 
