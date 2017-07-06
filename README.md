@@ -14,7 +14,7 @@ ColorHolder holder = new ColorHolder(1080, 1920);
 
 2、Implements ColorHolder.ColorStrategy or use provided strategy to generate color array, and put your next operates in the Callback
 
-```
+```java
 holder.setStrategy(new Mandelbrot1())
         .setCallback(new ColorHolder.Callback() {
             @Override
