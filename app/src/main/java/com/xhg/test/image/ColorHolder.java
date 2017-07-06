@@ -2,6 +2,9 @@ package com.xhg.test.image;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by xionghg on 17-7-4.
@@ -9,18 +12,25 @@ import android.os.AsyncTask;
 
 public class ColorHolder {
 
+    public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final String TAG = "ColorHolder";
+    private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
     private int mHeight;
     private int mWidth;
     private ColorStrategy mStrategy;
+    private Callback mCallback;
     private int[] mColorArray;
     private int mAlpha = 0xff << 24;
+    private AtomicInteger resultCount = new AtomicInteger(0);
+    private AtomicInteger successCount = new AtomicInteger(0);
+    private volatile Status mStatus = Status.PENDING;
 
     public ColorHolder() {
         this(1024, 1024);
     }
 
     public ColorHolder(int width, int height) {
-        if (width <= 0 || height <= 0) {
+        if (numberWrong(width) || numberWrong(height)) {
             throw new IllegalArgumentException("params not right");
         }
         this.mWidth = width;
@@ -28,57 +38,82 @@ public class ColorHolder {
         mColorArray = new int[width * height];
     }
 
+    private boolean numberWrong(int number) {
+        if (number <= 0 || number > 10000)
+            return true;
+        return false;
+    }
+
+    /**
+     * Create a bitmap using the color array created.
+     *
+     * @return Null if mStatus is not Status.FINISHED, always call this method in CallBack
+     */
     public Bitmap createBitmap() {
+        if (mStatus != Status.FINISHED) {
+            return null;
+        }
         return Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
     }
 
-    public void createColors() {
-        //单线程4.12s
-        for (int j = 0; j < mHeight; j++) {
+    public void createColors(int startHeight, int endHeight) {
+        //单线程7.869s
+        //2线程4.001s
+        //3线程4.294s  3664 4405 4815
+        //6线程1.773s  1761 1871 1688
+        //7线程1.763s
+        for (int j = startHeight; j < endHeight; j++) {
             for (int i = 0; i < mWidth; i++) {
                 int r = mStrategy.getRed(i, j) % 256 << 16;
                 int g = mStrategy.getGreen(i, j) % 256 << 8;
                 int b = mStrategy.getBlue(i, j) % 256;
                 mColorArray[j * mWidth + i] = mAlpha | r | g | b;
-//                    if (i+j < mWidth) {
-//                        mColorArray[i * mWidth + j] = 0xffff0000;
-//                    } else {
-//                        mColorArray[i * mWidth + j] = 0xff00ff00;
-//                    }
             }
         }
     }
 
-//    public abstract void onColorCreated();
-
-    private class MyAsyncTask extends AsyncTask<Integer, Integer, Void> {
-
-        @Override
-        protected Void doInBackground(Integer... params) {
-            if (params.length < 2) {
-                return null;
+    private void createColorFinish() {
+        Log.d(TAG, "create color finish: ");
+        mStatus = Status.FINISHED;
+        if (mCallback != null) {
+            if (successCount.get() == PARALLEL_COUNT) {
+                mCallback.onColorsCreated();
+            } else {
+                mCallback.onError();
             }
-            int total = params[0];
-            int current = params[1];
-            for (int j = 0; j < mHeight; j++) {
-                for (int i = 0; i < mWidth; i++) {
-                    int r = mStrategy.getRed(i, j) % 256;
-                    int g = mStrategy.getGreen(i, j) % 256;
-                    int b = mStrategy.getBlue(i, j) % 256;
-                    mColorArray[j * mWidth + i] = mAlpha | r | g | b;
-                }
-            }
+        }
+        resultCount.set(0);
+        successCount.set(0);
+    }
 
-            return null;
+    private void start(boolean inParallel) {
+        Log.d(TAG, "create color start: cpu_count=" + CPU_COUNT);
+        mStatus = Status.RUNNING;
+        if (mStrategy == null) {
+            // Initialize a strategy if not specified
+            mStrategy = new Mandelbrot1();
+        }
+        if (inParallel) {
+            int begin;
+            int end = 0;
+            for (int i = 1; i <= PARALLEL_COUNT; i++) {
+                begin = end;
+                end = mHeight * i / PARALLEL_COUNT;
+                Log.d(TAG, "start in parallel, begin=" + begin + " end=" + end);
+                new MyAsyncTask("AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
+            }
+        } else {
+            Log.d(TAG, "start in serial, begin=0 end=" + mHeight);
+            new MyAsyncTask("AsyncTask#Single").execute(0, mHeight);
         }
     }
 
-    public interface ColorStrategy {
-        int getRed(int i, int j);
+    public void startInParallel() {
+        start(mHeight > 300 || mColorArray.length > 100000);
+    }
 
-        int getGreen(int i, int j);
-
-        int getBlue(int i, int j);
+    public void startInSerial() {
+        start(false);
     }
 
     public int getHeight() {
@@ -101,14 +136,18 @@ public class ColorHolder {
         return mStrategy;
     }
 
-    /**
-     * Set ColorStrategy and create color array
-     *
-     * @param strategy
-     */
-    public void setStrategy(ColorStrategy strategy) {
+    public ColorHolder setStrategy(ColorStrategy strategy) {
         mStrategy = strategy;
-        createColors();
+        return this;
+    }
+
+    public Callback getCallback() {
+        return mCallback;
+    }
+
+    public ColorHolder setCallback(Callback callback) {
+        mCallback = callback;
+        return this;
     }
 
     /**
@@ -125,7 +164,103 @@ public class ColorHolder {
         return mAlpha;
     }
 
+    /**
+     * Set the alpha value for the Bitmap if you want
+     *
+     * @param alpha
+     */
     public void setAlpha(int alpha) {
         mAlpha = alpha;
+    }
+
+    /**
+     * Indicates the current status of the holder.
+     */
+    public enum Status {
+        /**
+         * Indicates that the holder has not created colors yet.
+         */
+        PENDING,
+        /**
+         * Indicates that the holder is creating colors.
+         */
+        RUNNING,
+        /**
+         * Indicates that {@link ColorHolder#createBitmap} has finished.
+         */
+        FINISHED,
+    }
+
+    /**
+     * Interface definition for a callback to be invoked when a view is clicked.
+     */
+    public interface Callback {
+        /**
+         * Called when colors has been created.
+         */
+        void onColorsCreated();
+
+        /**
+         * Called when error happens when creating colors.
+         */
+        void onError();
+    }
+
+    /**
+     * Interface definition for a color strategy to be invoked.
+     */
+    public interface ColorStrategy {
+        /**
+         * @param i The position in horizontal
+         * @param j The position in vertical
+         * @return R values of pixel
+         */
+        int getRed(int i, int j);
+
+        /**
+         * @param i The position in horizontal
+         * @param j The position in vertical
+         * @return G values of pixel
+         */
+        int getGreen(int i, int j);
+
+        /**
+         * @param i The position in horizontal
+         * @param j The position in vertical
+         * @return B values of pixel
+         */
+        int getBlue(int i, int j);
+    }
+
+    private class MyAsyncTask extends AsyncTask<Integer, Void, Boolean> {
+        private String mName = "AsyncTask";
+
+        public MyAsyncTask(String name) {
+            super();
+            mName = name;
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... params) {
+            Log.d(TAG, mName + " doInBackground:");
+            if (params.length < 2) {
+                return false;
+            }
+            int start = params[0];
+            int end = params[1];
+            createColors(start, end);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            Log.d(TAG, mName + " onPostExecute called");
+            if (aBoolean) {
+                successCount.getAndIncrement();
+            }
+            if (resultCount.incrementAndGet() == PARALLEL_COUNT) {
+                createColorFinish();
+            }
+        }
     }
 }
