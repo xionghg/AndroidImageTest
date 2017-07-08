@@ -18,7 +18,6 @@ public class ColorHolder {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final String TAG = "ColorHolder";
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
-    private static final int PROGRESS_TOTAL = PARALLEL_COUNT * 100;
 
     private int mHeight;
     private int mWidth;
@@ -45,9 +44,7 @@ public class ColorHolder {
     }
 
     private boolean numberWrong(int number) {
-        if (number <= 0 || number > 10000)
-            return true;
-        return false;
+        return (number <= 0 || number > 10000);
     }
 
     /**
@@ -107,7 +104,7 @@ public class ColorHolder {
                 begin = end;
                 end = mHeight * i / PARALLEL_COUNT;
                 // Log.d(TAG, "start in parallel, begin=" + begin + " end=" + end);
-                new MyAsyncTask(i-1, "AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
+                new MyAsyncTask(i - 1, "AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
             }
         } else {
             mProgress = new int[1];
@@ -174,8 +171,6 @@ public class ColorHolder {
 
     /**
      * Set the alpha value for the Bitmap if you want
-     *
-     * @param alpha
      */
     public void setAlpha(int alpha) {
         mAlpha = alpha;
