@@ -25,8 +25,8 @@ public class ColorHolder {
     private Callback mCallback;
     private int[] mColorArray;
     private int mAlpha = 0xff << 24;
-    private AtomicInteger resultCount = new AtomicInteger(0);
-    private AtomicInteger successCount = new AtomicInteger(0);
+    private final AtomicInteger resultCount = new AtomicInteger(0);
+    private final AtomicInteger successCount = new AtomicInteger(0);
     private volatile Status mStatus = Status.PENDING;
     private int[] mProgress;
 
