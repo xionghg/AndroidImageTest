@@ -14,33 +14,61 @@
         android:layout_centerHorizontal="true"
         android:text="@string/label_text" />
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/text"/>
+    <RelativeLayout
+        android:id="@+id/image_container"
+        android:layout_width="match_parent"
+        android:layout_height="370dp"
+        android:layout_below="@+id/text">
 
-    <Button
-        android:id="@+id/start_button"
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/empty_image_300dp" />
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progress_text"
+        android:layout_centerHorizontal="true"
+        style= "?android:attr/progressBarStyleHorizontal"
+        android:max="100"
+        android:progress= "0"/>
+
+    <TextView
+        android:id="@+id/progress_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/save_button"
+        android:layout_above="@+id/bottom_button"
         android:layout_marginBottom="8dp"
         android:layout_centerHorizontal="true"
-        android:text="Start"
-        android:textAllCaps="false" />
+        android:text="@string/no_progress" />
 
-    <Button
-        android:id="@+id/save_button"
+    <LinearLayout
+        android:id="@+id/bottom_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp"
         android:layout_centerHorizontal="true"
-        android:enabled="false"
-        android:text="Save"
-        android:textAllCaps="false" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Start"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="Save"
+            android:textAllCaps="false" />
+    </LinearLayout>
 
 </RelativeLayout>

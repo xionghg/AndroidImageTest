@@ -19,9 +19,9 @@ public class FileUtils {
 
     private static final String TAG = "FileUtils";
 
-    public static void writeBitmapToStorage(Bitmap bitmap) {
+    public static String writeBitmapToStorage(Bitmap bitmap) {
         if (bitmap == null) {
-            return;
+            return null;
         }
         File parent_path = Environment.getExternalStorageDirectory();
         // 可以建立一个子目录专门存放自己专属文件
@@ -42,7 +42,8 @@ public class FileUtils {
             Log.d(TAG, "文件写入成功");
         } catch (IOException e) {
             Log.e(TAG, "writeBitmapToStorage: ", e);
+            return null;
         }
-
+        return file.getAbsolutePath();
     }
 }

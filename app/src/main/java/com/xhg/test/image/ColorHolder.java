@@ -18,6 +18,8 @@ public class ColorHolder {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final String TAG = "ColorHolder";
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
+    private static final int PROGRESS_TOTAL = PARALLEL_COUNT * 100;
+
     private int mHeight;
     private int mWidth;
     private ColorStrategy mStrategy;
@@ -27,6 +29,7 @@ public class ColorHolder {
     private AtomicInteger resultCount = new AtomicInteger(0);
     private AtomicInteger successCount = new AtomicInteger(0);
     private volatile Status mStatus = Status.PENDING;
+    private int[] mProgress;
 
     public ColorHolder() {
         this(1024, 1024);
@@ -59,19 +62,16 @@ public class ColorHolder {
         return Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
     }
 
-    public void createColors(int startHeight, int endHeight) {
-        //单线程7.869s
-        //2线程4.001s
-        //3线程4.294s  3664 4405 4815
-        //6线程1.773s  1761 1871 1688
-        //7线程1.763s
-        for (int j = startHeight; j < endHeight; j++) {
-            for (int i = 0; i < mWidth; i++) {
-                int r = mStrategy.getRed(i, j) % 256 << 16;
-                int g = mStrategy.getGreen(i, j) % 256 << 8;
-                int b = mStrategy.getBlue(i, j) % 256;
-                mColorArray[j * mWidth + i] = mAlpha | r | g | b;
+    private void updateProgress(int index, int progress) {
+        if (mCallback != null) {
+            mProgress[index] = progress;
+            int current = 0;
+            int total = 0;
+            for (int p : mProgress) {
+                current += p;
+                total += 100;
             }
+            mCallback.onProgressUpdate(current * 100 / total);
         }
     }
 
@@ -80,6 +80,7 @@ public class ColorHolder {
         mStatus = Status.FINISHED;
         if (mCallback != null) {
             if (successCount.get() == PARALLEL_COUNT) {
+                mCallback.onProgressUpdate(100);
                 mCallback.onColorsCreated();
             }
         }
@@ -97,18 +98,21 @@ public class ColorHolder {
         if (mCallback != null) {
             mCallback.onStart();
         }
+
         if (inParallel) {
+            mProgress = new int[PARALLEL_COUNT];
             int begin;
             int end = 0;
             for (int i = 1; i <= PARALLEL_COUNT; i++) {
                 begin = end;
                 end = mHeight * i / PARALLEL_COUNT;
-                Log.d(TAG, "start in parallel, begin=" + begin + " end=" + end);
-                new MyAsyncTask("AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
+                // Log.d(TAG, "start in parallel, begin=" + begin + " end=" + end);
+                new MyAsyncTask(i-1, "AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
             }
         } else {
-            Log.d(TAG, "start in serial, begin=0 end=" + mHeight);
-            new MyAsyncTask("AsyncTask#Single").execute(0, mHeight);
+            mProgress = new int[1];
+            // Log.d(TAG, "start in serial, begin=0 end=" + mHeight);
+            new MyAsyncTask(0, "AsyncTask#Single").execute(0, mHeight);
         }
     }
 
@@ -204,17 +208,25 @@ public class ColorHolder {
          * same things before start generate colors, like set Button to disable.
          */
         void onStart();
+
+        /**
+         * Called when progress updated..
+         */
+        void onProgressUpdate(int progress);
+
         /**
          * Called when colors has been created.
          */
         void onColorsCreated();
     }
 
-    private class MyAsyncTask extends AsyncTask<Integer, Void, Boolean> {
+    private class MyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
+        private int mIndex = 0;
         private String mName = "AsyncTask";
 
-        public MyAsyncTask(String name) {
+        public MyAsyncTask(int index, String name) {
             super();
+            mIndex = index;
             mName = name;
         }
 
@@ -226,8 +238,28 @@ public class ColorHolder {
             }
             int start = params[0];
             int end = params[1];
-            createColors(start, end);
+            //单线程7.869s
+            //2线程4.001s
+            //3线程4.294s  3664 4405 4815
+            //6线程1.773s  1761 1871 1688
+            //7线程1.763s
+            for (int j = start; j < end; j++) {
+                for (int i = 0; i < mWidth; i++) {
+                    int r = mStrategy.getRed(i, j) % 256 << 16;
+                    int g = mStrategy.getGreen(i, j) % 256 << 8;
+                    int b = mStrategy.getBlue(i, j) % 256;
+                    mColorArray[j * mWidth + i] = mAlpha | r | g | b;
+                }
+                publishProgress(j, start, end);
+            }
             return true;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            int total = values[2] - values[1];
+            int current = values[0] - values[1] + 1;
+            updateProgress(mIndex, current * 100 / total);
         }
 
         @Override
