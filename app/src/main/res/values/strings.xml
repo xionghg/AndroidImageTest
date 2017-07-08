@@ -1,3 +1,8 @@
 <resources>
+    <!-- strings -->
     <string name="app_name">AndroidImageTest</string>
+    <string name="label_text">Android Image Test</string>
+
+    <!-- dimens -->
+    <dimen name="root_view_padding">16dp</dimen>
 </resources>

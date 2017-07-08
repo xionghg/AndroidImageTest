@@ -20,6 +20,9 @@ public class FileUtils {
     private static final String TAG = "FileUtils";
 
     public static void writeBitmapToStorage(Bitmap bitmap) {
+        if (bitmap == null) {
+            return;
+        }
         File parent_path = Environment.getExternalStorageDirectory();
         // 可以建立一个子目录专门存放自己专属文件
         File dir = new File(parent_path.getAbsoluteFile(), "testbitmap");

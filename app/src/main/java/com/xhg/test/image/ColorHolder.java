@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.xhg.test.image.strategies.ColorStrategy;
+import com.xhg.test.image.strategies.Mandelbrot1;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -78,8 +81,6 @@ public class ColorHolder {
         if (mCallback != null) {
             if (successCount.get() == PARALLEL_COUNT) {
                 mCallback.onColorsCreated();
-            } else {
-                mCallback.onError();
             }
         }
         resultCount.set(0);
@@ -92,6 +93,9 @@ public class ColorHolder {
         if (mStrategy == null) {
             // Initialize a strategy if not specified
             mStrategy = new Mandelbrot1();
+        }
+        if (mCallback != null) {
+            mCallback.onStart();
         }
         if (inParallel) {
             int begin;
@@ -196,40 +200,14 @@ public class ColorHolder {
      */
     public interface Callback {
         /**
+         * Called before generate colors, add this interface because we always want to do the
+         * same things before start generate colors, like set Button to disable.
+         */
+        void onStart();
+        /**
          * Called when colors has been created.
          */
         void onColorsCreated();
-
-        /**
-         * Called when error happens when creating colors.
-         */
-        void onError();
-    }
-
-    /**
-     * Interface definition for a color strategy to be invoked.
-     */
-    public interface ColorStrategy {
-        /**
-         * @param i The position in horizontal
-         * @param j The position in vertical
-         * @return R values of pixel
-         */
-        int getRed(int i, int j);
-
-        /**
-         * @param i The position in horizontal
-         * @param j The position in vertical
-         * @return G values of pixel
-         */
-        int getGreen(int i, int j);
-
-        /**
-         * @param i The position in horizontal
-         * @param j The position in vertical
-         * @return B values of pixel
-         */
-        int getBlue(int i, int j);
     }
 
     private class MyAsyncTask extends AsyncTask<Integer, Void, Boolean> {
