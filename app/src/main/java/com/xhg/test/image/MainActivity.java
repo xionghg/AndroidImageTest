@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
                 .setCallback(new ColorHolder.Callback() {
                     @Override
                     public void onStart() {
+                        mStartButton.setEnabled(false);
                         mSaveButton.setEnabled(false);
                         mProgressBar.setProgress(0);
                         mProgressTextView.setText(R.string.no_progress);
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                         mBitmap = mHolder.createBitmap();
                         Log.d(TAG, "ColorHolder: create image end");
                         mImageView.setImageBitmap(mBitmap);
+                        mStartButton.setEnabled(true);
                         mSaveButton.setEnabled(true);
                     }
                 });
