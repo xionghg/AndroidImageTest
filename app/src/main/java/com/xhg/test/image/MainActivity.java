@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.xhg.test.image.strategies.Mandelbrot1;
 
@@ -20,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ColorHolder mHolder;
     private ImageView mImageView;
+    private ProgressBar mProgressBar;
+    private TextView mProgressTextView;
     private Button mStartButton;
     private Button mSaveButton;
     private Bitmap mBitmap;
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         mImageView = (ImageView) findViewById(R.id.image);
+        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
         mStartButton = (Button) findViewById(R.id.start_button);
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
