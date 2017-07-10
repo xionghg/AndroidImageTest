@@ -3,16 +3,19 @@ package com.xhg.test.image;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xhg.test.image.strategies.Mandelbrot1;
+import com.xhg.test.image.strategies.Mandelbrot3;
 
 import java.util.Locale;
 
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "initData");
         mHolder = new ColorHolder();
         // init mHolder and start
-        mHolder.setStrategy(new Mandelbrot1())
+        mHolder.setStrategy(new Mandelbrot3())
                 .setCallback(new ColorHolder.Callback() {
                     @Override
                     public void onStart() {
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        RecyclerView recyclerView;
+        ListView listView;
     }
 
 }

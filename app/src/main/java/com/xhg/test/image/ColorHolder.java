@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.strategies.Mandelbrot1;
+import com.xhg.test.image.strategies.Mandelbrot3;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -247,6 +248,11 @@ public class ColorHolder {
                 }
                 publishProgress(j, start, end);
             }
+            if (mStrategy instanceof Mandelbrot3) {
+                // 发现一个多线程问题，rcount > width * height
+                Log.d(TAG, "doInBackground: getCount=" + ((Mandelbrot3) mStrategy).rcount.get() +
+                        " " + ((Mandelbrot3) mStrategy).gcount );
+            }
             return true;
         }
 
@@ -263,7 +269,7 @@ public class ColorHolder {
             if (aBoolean) {
                 successCount.getAndIncrement();
             }
-            if (resultCount.incrementAndGet() == PARALLEL_COUNT) {
+            if (resultCount.incrementAndGet() == mProgress.length) {
                 createColorFinish();
             }
         }
