@@ -1,13 +1,14 @@
 package com.xhg.test.image.strategies;
 
 /**
- * Created by xionghg on 17-7-4.
+ * 分形图形1
+ *
+ * @author xionghg
+ * @email xiong9394@gmail.com
+ * @created 2017-07-04.
  */
 
-/**
- * 分形图形1
- */
-public class Mandelbrot1 implements ColorStrategy {
+public class Mandelbrot1 extends ColorStrategy {
 
     @Override
     public int getRed(int x, int y) {

@@ -11,7 +11,9 @@ import com.xhg.test.image.strategies.Mandelbrot3;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by xionghg on 17-7-4.
+ * @author xionghg
+ * @email xiong9394@gmail.com
+ * @created 2017-07-04.
  */
 
 public class ColorHolder {
@@ -241,10 +243,11 @@ public class ColorHolder {
             //7线程1.763s
             for (int j = start; j < end; j++) {
                 for (int i = 0; i < mWidth; i++) {
-                    int r = mStrategy.getRed(i, j) % 256 << 16;
-                    int g = mStrategy.getGreen(i, j) % 256 << 8;
-                    int b = mStrategy.getBlue(i, j) % 256;
-                    mColorArray[j * mWidth + i] = mAlpha | r | g | b;
+                    //int r = mStrategy.getRed(i, j) % 256 << 16;
+                    //int g = mStrategy.getGreen(i, j) % 256 << 8;
+                    //int b = mStrategy.getBlue(i, j) % 256;
+                    int rgb = mStrategy.getRGB(i, j);
+                    mColorArray[j * mWidth + i] = mAlpha | rgb;
                 }
                 publishProgress(j, start, end);
             }

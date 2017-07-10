@@ -1,17 +1,16 @@
 package com.xhg.test.image.strategies;
 
-/**
- * Created by xionghg on 17-7-4.
- */
-
-import android.util.Log;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 分形图形2
+ * 分形图形3
+ *
+ * @author xionghg
+ * @email xiong9394@gmail.com
+ * @created 2017-07-10.
  */
-public class Mandelbrot3 implements ColorStrategy {
+
+public class Mandelbrot3 extends ColorStrategy {
 
     private int[] mCache = new int[3];
 
@@ -32,7 +31,6 @@ public class Mandelbrot3 implements ColorStrategy {
     @Override
     public int getGreen(int x, int y) {
         if (mCache[0] == x && mCache[1] == y) {
-//            Log.d("xhg", "getGreen: " + count.getAndIncrement());
             gcount.getAndIncrement();
             return 2 * mCache[2];
         }
