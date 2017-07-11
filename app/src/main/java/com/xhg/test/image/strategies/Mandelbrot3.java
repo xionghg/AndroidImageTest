@@ -30,11 +30,9 @@ public class Mandelbrot3 extends ColorStrategy {
 
     @Override
     public int getRGB(int x, int y) {
-        int rgb = 0;
-        int r = getRed(x, y);
-        rgb |= r % 256 << 16;
-        rgb |= r * 2 % 256 << 8;
-        rgb |= r * 4 % 256;
-        return rgb;
+        int r = getRed(x, y) % 256 << 16;
+        int g = 2 * r % 256 << 8;
+        int b = 4 * r % 256;
+        return r | g | b;
     }
 }

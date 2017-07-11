@@ -1,4 +1,4 @@
-package com.xhg.test.image;
+package com.xhg.test.image.utils;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
