@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.strategies.Mandelbrot1;
-import com.xhg.test.image.strategies.Mandelbrot3;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -79,7 +78,7 @@ public class ColorHolder {
         Log.d(TAG, "create color finish: ");
         mStatus = Status.FINISHED;
         if (mCallback != null) {
-            if (successCount.get() == PARALLEL_COUNT) {
+            if (successCount.get() == mProgress.length) {
                 mCallback.onProgressUpdate(100);
                 mCallback.onColorsCreated();
             }
@@ -218,6 +217,24 @@ public class ColorHolder {
         void onColorsCreated();
     }
 
+    /**
+     * An implementation of {@link ColorHolder.Callback} that has empty method bodies and
+     * default return values.
+     */
+    public static class SimpleCallback implements Callback {
+        @Override
+        public void onStart() {
+        }
+
+        @Override
+        public void onProgressUpdate(int progress) {
+        }
+
+        @Override
+        public void onColorsCreated() {
+        }
+    }
+
     private class MyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
         private int mIndex = 0;
         private String mName = "AsyncTask";
@@ -230,7 +247,7 @@ public class ColorHolder {
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            Log.d(TAG, mName + " doInBackground:");
+            Log.v(TAG, mName + " doInBackground:");
             if (params.length < 2) {
                 return false;
             }
