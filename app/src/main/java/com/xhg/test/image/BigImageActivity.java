@@ -8,20 +8,17 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xhg.test.image.model.StrategyModel;
 import com.xhg.test.image.strategies.ColorStrategy;
-import com.xhg.test.image.strategies.Mandelbrot1;
 import com.xhg.test.image.utils.FileUtils;
 
 import java.util.Locale;
@@ -107,8 +104,6 @@ public class BigImageActivity extends AppCompatActivity {
                 checkPermissionAndSave();
             }
         });
-        RecyclerView recyclerView;
-        ListView listView;
     }
 
     private void savePicture() {

@@ -8,7 +8,7 @@ package com.xhg.test.image.strategies;
  * @created 2017-07-10.
  */
 
-public class Mandelbrot3 extends ColorStrategy {
+public class Mandelbrot3 extends CombinedRGBColorStrategy {
 
     @Override
     public int getRed(int x, int y) {
@@ -16,16 +16,6 @@ public class Mandelbrot3 extends ColorStrategy {
         for (; a * a + (d = b * b) < 4 && n++ < 8192; b = 2 * a * b + y / 5e4 + .06, a = a * a - d + x / 5e4 + .34)
             ;
         return (int) (n / 4);
-    }
-
-    @Override
-    public int getGreen(int x, int y) {
-        return 2 * getRed(x, y);
-    }
-
-    @Override
-    public int getBlue(int x, int y) {
-        return 4 * getRed(x, y);
     }
 
     @Override

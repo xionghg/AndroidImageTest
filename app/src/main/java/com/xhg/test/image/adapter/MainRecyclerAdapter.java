@@ -24,7 +24,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     private static final String TAG = "TestBitmap-MainAdapter";
 
-    private List<ColorStrategy> mDatas;
+    private List<ColorStrategy> mData;
     private Context mContext;
     private LayoutInflater mInflater;
     /**
@@ -34,23 +34,23 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     public MainRecyclerAdapter(Context context, List<ColorStrategy> data) {
         this.mContext = context;
-        this.mDatas = data;
+        this.mData = data;
         mInflater = LayoutInflater.from(mContext);
     }
 
     public void updateData(List<ColorStrategy> data) {
-        this.mDatas = data;
-        Log.d(TAG, "updateData: size=" + mDatas.size());
+        this.mData = data;
+        Log.d(TAG, "updateData: size=" + mData.size());
         notifyDataSetChanged();
     }
 
     public void addItem(int position, ColorStrategy colorStrategy) {
-        mDatas.add(position, colorStrategy);
+        mData.add(position, colorStrategy);
         notifyItemInserted(position);
     }
 
     public void removeItem(int position) {
-        mDatas.remove(position);
+        mData.remove(position);
         notifyItemRemoved(position);
     }
 
@@ -65,14 +65,14 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
 
     @Override
     public int getItemCount() {
-        return mDatas == null ? 0 : mDatas.size();
+        return mData == null ? 0 : mData.size();
     }
 
     //填充onCreateViewHolder方法返回的holder中的控件
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final ColorHolder colorHolder = new ColorHolder(504, 504);
-        colorHolder.setStrategy(mDatas.get(position));
+        colorHolder.setStrategy(mData.get(position));
         colorHolder.setCallback(new ColorHolder.SimpleCallback() {
             @Override
             public void onColorsCreated() {

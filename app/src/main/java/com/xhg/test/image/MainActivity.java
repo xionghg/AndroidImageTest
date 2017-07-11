@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerAdapter.setOnItemClickListener(new MainRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                Log.d(TAG, "onItemClick: position=" + position);
                 Intent intent = new Intent(MainActivity.this, BigImageActivity.class);
                 intent.putExtra("strategy_index", position);
                 startActivity(intent);

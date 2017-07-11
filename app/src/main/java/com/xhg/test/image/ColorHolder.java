@@ -40,6 +40,10 @@ public class ColorHolder {
         if (numberWrong(width) || numberWrong(height)) {
             throw new IllegalArgumentException("params not right");
         }
+        setWidthAndHeight(width, height);
+    }
+
+    public void setWidthAndHeight(int width, int height) {
         this.mWidth = width;
         this.mHeight = height;
         mColorArray = new int[width * height];
@@ -52,7 +56,7 @@ public class ColorHolder {
     /**
      * Create a bitmap using the color array created.
      *
-     * @return Null if mStatus is not Status.FINISHED, always call this method in CallBack
+     * @return Null if mStatus is not Status.FINISHED, always call this method in CallBack.
      */
     public Bitmap createBitmap() {
         if (mStatus != Status.FINISHED) {
@@ -81,6 +85,9 @@ public class ColorHolder {
             if (successCount.get() == mProgress.length) {
                 mCallback.onProgressUpdate(100);
                 mCallback.onColorsCreated();
+            } else {
+                mCallback.onProgressUpdate(0);
+                mCallback.onError();
             }
         }
         resultCount.set(0);
@@ -127,16 +134,8 @@ public class ColorHolder {
         return mHeight;
     }
 
-    public void setHeight(int height) {
-        mHeight = height;
-    }
-
     public int getWidth() {
         return mWidth;
-    }
-
-    public void setWidth(int width) {
-        mWidth = width;
     }
 
     public ColorStrategy getStrategy() {
@@ -215,6 +214,11 @@ public class ColorHolder {
          * Called when colors has been created.
          */
         void onColorsCreated();
+
+        /**
+         * Called when errors happened.
+         */
+        void onError();
     }
 
     /**
@@ -232,6 +236,10 @@ public class ColorHolder {
 
         @Override
         public void onColorsCreated() {
+        }
+
+        @Override
+        public void onError() {
         }
     }
 
@@ -260,9 +268,6 @@ public class ColorHolder {
             //7线程1.763s
             for (int j = start; j < end; j++) {
                 for (int i = 0; i < mWidth; i++) {
-                    //int r = mStrategy.getRed(i, j) % 256 << 16;
-                    //int g = mStrategy.getGreen(i, j) % 256 << 8;
-                    //int b = mStrategy.getBlue(i, j) % 256;
                     int rgb = mStrategy.getRGB(i, j);
                     mColorArray[j * mWidth + i] = mAlpha | rgb;
                 }
