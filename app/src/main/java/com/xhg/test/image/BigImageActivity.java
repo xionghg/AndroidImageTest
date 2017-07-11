@@ -53,7 +53,7 @@ public class BigImageActivity extends AppCompatActivity {
         mHolder = new ColorHolder();
         // init mHolder and start
         mHolder.setStrategy(mStrategy)
-                .setCallback(new ColorHolder.Callback() {
+                .setCallback(new ColorHolder.SimpleCallback() {
                     @Override
                     public void onStart() {
                         mStartButton.setEnabled(false);
