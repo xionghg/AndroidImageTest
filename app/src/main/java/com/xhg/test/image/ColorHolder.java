@@ -251,11 +251,6 @@ public class ColorHolder {
                 }
                 publishProgress(j, start, end);
             }
-            if (mStrategy instanceof Mandelbrot3) {
-                // 发现一个多线程问题，rcount > width * height
-                Log.d(TAG, "doInBackground: getCount=" + ((Mandelbrot3) mStrategy).rcount.get() +
-                        " " + ((Mandelbrot3) mStrategy).gcount );
-            }
             return true;
         }
 

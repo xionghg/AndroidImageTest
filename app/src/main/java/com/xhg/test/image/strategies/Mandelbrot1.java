@@ -12,34 +12,23 @@ public class Mandelbrot1 extends ColorStrategy {
 
     @Override
     public int getRed(int x, int y) {
-        float m = 0, n = 0;
-        int k;
-        for (k = 0; k++ < 256; ) {
-            float a = (float) (m * m - n * n + (x - 768.0) / 512);
-            n = (float) (2 * m * n + (y - 512.0) / 512);
-            m = a;
-            if (m * m + n * n > 4)
-                break;
-        }
+        int k = getK(x, y);
         return (int) (Math.log(k) * 47);
     }
 
     @Override
     public int getGreen(int x, int y) {
-        float m = 0, n = 0;
-        int k;
-        for (k = 0; k++ < 256; ) {
-            float a = (float) (m * m - n * n + (x - 768.0) / 512);
-            n = (float) (2 * m * n + (y - 512.0) / 512);
-            m = a;
-            if (m * m + n * n > 4)
-                break;
-        }
+        int k = getK(x, y);
         return (int) (Math.log(k) * 47);
     }
 
     @Override
     public int getBlue(int x, int y) {
+        int k = getK(x, y);
+        return 128 - (int) (Math.log(k) * 23);
+    }
+
+    private int getK(int x, int y) {
         float m = 0, n = 0;
         int k;
         for (k = 0; k++ < 256; ) {
@@ -49,6 +38,15 @@ public class Mandelbrot1 extends ColorStrategy {
             if (m * m + n * n > 4)
                 break;
         }
-        return 128 - (int) (Math.log(k) * 23);
+        return k;
+    }
+
+    @Override
+    public int getRGB(int x, int y) {
+        int k = getK(x, y);
+        int r = (int) (Math.log(k) * 47) % 256 << 16;
+        int g = r >> 8;
+        int b = (128 - (int) (Math.log(k) * 23)) % 256;
+        return r|g|b;
     }
 }

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xhg.test.image.strategies.Mandelbrot1;
+import com.xhg.test.image.strategies.Mandelbrot2;
 import com.xhg.test.image.strategies.Mandelbrot3;
 
 import java.util.Locale;
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "initData");
         mHolder = new ColorHolder();
         // init mHolder and start
-        mHolder.setStrategy(new Mandelbrot3())
+        mHolder.setStrategy(new Mandelbrot1())
                 .setCallback(new ColorHolder.Callback() {
                     @Override
                     public void onStart() {
