@@ -92,7 +92,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
     //重写onCreateViewHolder方法，返回一个自定义的ViewHolder
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.recycle_item, parent, false);
+        View view = mInflater.inflate(R.layout.recycler_item, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
         return holder;
     }

@@ -2,14 +2,19 @@ package com.xhg.test.image;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.xhg.test.image.adapter.MainRecyclerAdapter;
 import com.xhg.test.image.model.StrategyModel;
@@ -38,6 +43,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            //显示导航按钮
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            //设置图标
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_30dp);
+        }
+
         initData();
 
         mToButton = (Button) findViewById(R.id.to_button);
@@ -77,5 +92,29 @@ public class MainActivity extends AppCompatActivity {
     private void initData() {
         mStrategyModel = StrategyModel.getInstance();
         mStrategies = Arrays.asList(mStrategyModel.getStrategies());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Toast.makeText(this, "Home function is coming soon", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.delete:
+                Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.help:
+                Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return true;
     }
 }
