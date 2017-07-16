@@ -4,6 +4,7 @@ import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.strategies.Mandelbrot1;
 import com.xhg.test.image.strategies.Mandelbrot2;
 import com.xhg.test.image.strategies.Mandelbrot3;
+import com.xhg.test.image.strategies.TableCloths;
 
 /**
  * @author xionghg
@@ -33,7 +34,7 @@ public class StrategyModel {
 
     private void init() {
         mStrategies = new ColorStrategy[]{new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()
-                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()
+                , new TableCloths(), new Mandelbrot2(), new Mandelbrot3()
                 , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()
                 , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()};
     }

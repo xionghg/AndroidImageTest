@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, BigImageActivity.class);
-                intent.putExtra("strategy_index", 2);
+                intent.putExtra("strategy_index", 3);
                 startActivity(intent);
             }
         });
