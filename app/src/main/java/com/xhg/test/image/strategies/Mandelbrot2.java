@@ -22,9 +22,9 @@ public class Mandelbrot2 extends CombinedRGBColorStrategy {
     @Override
     public int getRGB(int x, int y) {
         double n = getN(x, y);
-        int r = (int) (255 * Math.pow((n - 80) / 800, 3.)) % 256 << 16;
-        int g = (int) (255 * Math.pow((n - 80) / 800, .7)) % 256 << 8;
-        int b = (int) (255 * Math.pow((n - 80) / 800, .5)) % 256;
-        return r | g | b;
+        int r = (int) (255 * Math.pow((n - 80) / 800, 3.));
+        int g = (int) (255 * Math.pow((n - 80) / 800, .7));
+        int b = (int) (255 * Math.pow((n - 80) / 800, .5));
+        return generateRGB(r, g, b);
     }
 }

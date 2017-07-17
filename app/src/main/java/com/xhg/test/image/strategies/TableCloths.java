@@ -12,10 +12,10 @@ public class TableCloths extends CombinedRGBColorStrategy {
     @Override
     public int getRGB(int x, int y) {
         double[] params = getParams(x, y);
-        int r = ((int) params[0] % 2 + (int) params[1] % 2) * 127 % 256 << 16;
-        int g = ((int) (5 * params[0]) % 2 + (int) (5 * params[1]) % 2) * 127 % 256 << 8;
-        int b = ((int) (29 * params[0]) % 2 + (int) (29 * params[1]) % 2) * 127 % 256;
-        return r | g | b;
+        int r = ((int) params[0] % 2 + (int) params[1] % 2) * 127;
+        int g = ((int) (5 * params[0]) % 2 + (int) (5 * params[1]) % 2) * 127;
+        int b = ((int) (29 * params[0]) % 2 + (int) (29 * params[1]) % 2) * 127;
+        return generateRGB(r, g, b);
     }
 
     private double[] getParams(int x, int y) {

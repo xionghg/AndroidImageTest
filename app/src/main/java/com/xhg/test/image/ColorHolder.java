@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ColorHolder {
 
-    public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final String TAG = "ColorHolder";
+    public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
 
     private int mHeight;
@@ -81,6 +81,7 @@ public class ColorHolder {
     private void createColorFinish() {
         Log.d(TAG, "create color finish: ");
         mStatus = Status.FINISHED;
+        mStrategy.recycle(); // release after finished
         if (mCallback != null) {
             if (successCount.get() == mProgress.length) {
                 mCallback.onProgressUpdate(100);
@@ -94,13 +95,16 @@ public class ColorHolder {
         successCount.set(0);
     }
 
-    private void start(boolean inParallel) {
-        Log.d(TAG, "create color start: cpu_count=" + CPU_COUNT);
+    private void startCreateColor(boolean inParallel) {
+        Log.d(TAG, "create color startCreateColor: cpu_count=" + CPU_COUNT);
         mStatus = Status.RUNNING;
+
         if (mStrategy == null) {
             // Initialize a strategy if not specified
             mStrategy = new Mandelbrot1();
         }
+        mStrategy.setWidthAndHeight(mWidth, mHeight);   //init() will be called in this method
+
         if (mCallback != null) {
             mCallback.onStart();
         }
@@ -112,22 +116,22 @@ public class ColorHolder {
             for (int i = 1; i <= PARALLEL_COUNT; i++) {
                 begin = end;
                 end = mHeight * i / PARALLEL_COUNT;
-                // Log.d(TAG, "start in parallel, begin=" + begin + " end=" + end);
+                // Log.d(TAG, "startCreateColor in parallel, begin=" + begin + " end=" + end);
                 new MyAsyncTask(i - 1, "AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
             }
         } else {
             mProgress = new int[1];
-            // Log.d(TAG, "start in serial, begin=0 end=" + mHeight);
+            // Log.d(TAG, "startCreateColor in serial, begin=0 end=" + mHeight);
             new MyAsyncTask(0, "AsyncTask#Single").execute(0, mHeight);
         }
     }
 
     public void startInParallel() {
-        start(mHeight > 300 || mColorArray.length > 100000);
+        startCreateColor(mHeight > 300 || mColorArray.length > 100000);
     }
 
     public void startInSerial() {
-        start(false);
+        startCreateColor(false);
     }
 
     public int getHeight() {
@@ -201,7 +205,7 @@ public class ColorHolder {
     public interface Callback {
         /**
          * Called before generate colors, add this interface because we always want to do the
-         * same things before start generate colors, like set Button to disable.
+         * same things before startCreateColor generate colors, like set Button to disable.
          */
         void onStart();
 
@@ -284,9 +288,9 @@ public class ColorHolder {
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
+        protected void onPostExecute(Boolean execRight) {
             Log.d(TAG, mName + " onPostExecute called");
-            if (aBoolean) {
+            if (execRight) {
                 successCount.getAndIncrement();
             }
             if (resultCount.incrementAndGet() == mProgress.length) {

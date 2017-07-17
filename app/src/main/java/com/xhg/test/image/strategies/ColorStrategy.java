@@ -48,4 +48,24 @@ public interface ColorStrategy {
      * @return RGB values of pixel
      */
     int getRGB(int x, int y);
+
+    /**
+     * Called before strategy start.
+     * Override this method if some initial operation are needed.
+     */
+    void init();
+
+    /**
+     * Called after strategy finish.
+     * Override this method if some release operation are needed.
+     */
+    void recycle();
+
+    /**
+     * Set max width and height if needed.
+     *
+     * @param width
+     * @param height
+     */
+    void setWidthAndHeight(int width, int height);
 }

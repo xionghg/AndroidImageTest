@@ -79,6 +79,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
                 holder.imageView.setImageBitmap(colorHolder.createBitmap());
             }
         }).startInParallel();
+
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {

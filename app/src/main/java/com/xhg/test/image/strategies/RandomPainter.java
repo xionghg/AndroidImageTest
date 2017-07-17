@@ -8,13 +8,12 @@ package com.xhg.test.image.strategies;
 
 public class RandomPainter extends CombinedRGBColorStrategy {
 
-    private static int DIM = 1024;
-    char[][] r = new char[DIM][DIM];
-    char[][] g = new char[DIM][DIM];
-    char[][] b = new char[DIM][DIM];
+    private char[][] r;
+    private char[][] g;
+    private char[][] b;
 
     private char random(int n) {
-        return (char) (DIM * Math.random() % n);
+        return (char) (1024 * Math.random() % n);
     }
 
     private char getColor(char[][] c, int i, int j) {
@@ -22,7 +21,7 @@ public class RandomPainter extends CombinedRGBColorStrategy {
             if (random(999) == 0) {
                 return c[i][j] = random(256);
             } else {
-                return c[i][j] = getColor(c, (i + random(2)) % DIM, (j + random(2)) % DIM);
+                return c[i][j] = getColor(c, (i + random(2)) % WIDTH, (j + random(2)) % HEIGHT);
             }
         } else {
             return c[i][j];
@@ -30,10 +29,24 @@ public class RandomPainter extends CombinedRGBColorStrategy {
     }
 
     @Override
+    public void init() {
+        r = new char[WIDTH][HEIGHT];
+        g = new char[WIDTH][HEIGHT];
+        b = new char[WIDTH][HEIGHT];
+    }
+
+    @Override
     public int getRGB(int x, int y) {
-        int red = (int) getColor(r, x, y) % 256 << 16;
-        int green = (int) getColor(g, x, y) % 256 << 8;
-        int blue = (int) getColor(b, x, y) % 256;
-        return red | green | blue;
+        int red = (int) getColor(r, x, y);
+        int green = (int) getColor(g, x, y);
+        int blue = (int) getColor(b, x, y);
+        return generateRGB(red, green, blue);
+    }
+
+    @Override
+    public void recycle() {
+        r = null;
+        g = null;
+        b = null;
     }
 }

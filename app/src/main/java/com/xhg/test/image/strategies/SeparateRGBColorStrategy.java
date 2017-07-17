@@ -33,4 +33,22 @@ public abstract class SeparateRGBColorStrategy implements ColorStrategy{
         rgb |= (getBlue(x, y) % 256);
         return rgb;
     }
+
+    @Override
+    public void init() {
+    }
+
+    @Override
+    public void recycle() {
+    }
+
+    private int WIDTH;
+    private int HEIGHT;
+
+    @Override
+    public void setWidthAndHeight(int width, int height) {
+        WIDTH = width;
+        HEIGHT = height;
+        init();
+    }
 }
