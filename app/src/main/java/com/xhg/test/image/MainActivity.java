@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             //显示导航按钮
             actionBar.setDisplayHomeAsUpEnabled(true);
             //设置图标
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_30dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_32dp);
         }
 
         initData();
