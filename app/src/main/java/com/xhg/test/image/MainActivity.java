@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 Toast.makeText(this, "Home function is coming soon", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.delete:
+            case R.id.settings:
                 Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.help:

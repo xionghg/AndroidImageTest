@@ -3,13 +3,14 @@
       xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/delete"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="Delete"
-        app:showAsAction="always"/>
-    <item
         android:id="@+id/help"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_help_white"
         android:title="Help"
-        app:showAsAction="never"/>
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/ic_settings_white"
+        android:title="Delete"
+        app:showAsAction="ifRoom"/>
 </menu>
