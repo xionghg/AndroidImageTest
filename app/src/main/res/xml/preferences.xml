@@ -10,17 +10,18 @@
         android:layout="@layout/preference_category_widget"
         android:title="基本设置">
         <CheckBoxPreference
-            android:key="@+id/save_net_mode"
+            android:key="@string/save_net_mode"
             android:layout="@layout/preference_item"
             android:title="省流量模式"
             android:summary="仅在Wi-Fi环境下才自动加载图片"
             android:defaultValue="false"
             />
-        <CheckBoxPreference
-            android:key="@+id/auto_save_mode"
+        <SwitchPreference
+            android:key="@string/auto_save_mode"
             android:layout="@layout/preference_item"
             android:title="自动保存"
             android:summary="自动保存程序生成的图片"
+            android:defaultValue="true"
             />
         <Preference
             android:layout="@layout/preference_item"

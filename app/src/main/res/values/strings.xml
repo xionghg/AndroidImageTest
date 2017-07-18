@@ -8,5 +8,7 @@
 
     <!-- settings -->
     <string name="title_activity_setting">Settings</string>
+    <string name="save_net_mode">save_net_mode</string>
+    <string name="auto_save_mode">auto_save_mode</string>
 
 </resources>
