@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--最新栏目的新闻-->
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
-                  android:layout="@layout/preference_item"
                   android:title="@string/title_activity_setting">
 
-    <PreferenceCategory
-        android:layout="@layout/preference_category_widget"
-        android:title="基本设置">
+    <PreferenceCategory android:title="基本设置">
+
         <CheckBoxPreference
-            android:key="@string/save_net_mode"
-            android:layout="@layout/preference_item"
+            android:key="@string/preference_save_net_mode"
             android:title="省流量模式"
             android:summary="仅在Wi-Fi环境下才自动加载图片"
             android:defaultValue="false"
             />
+
         <SwitchPreference
-            android:key="@string/auto_save_mode"
-            android:layout="@layout/preference_item"
+            android:key="@string/preference_auto_save_mode"
             android:title="自动保存"
             android:summary="自动保存程序生成的图片"
             android:defaultValue="true"
             />
+
         <Preference
-            android:layout="@layout/preference_item"
+            android:key="@string/preference_clear_cache"
             android:title="清空缓存"
             android:summary="删除已缓存的图片"
+            android:dependency="@string/preference_auto_save_mode"
             />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:layout="@layout/preference_category_widget"
-        android:title="其他说明">
-        <Preference
-            android:layout="@layout/preference_item"
-            android:summary="V 1.0"
-            android:title="当前版本" />
-        <Preference
-            android:layout="@layout/preference_item"
-            android:summary="E-mail: xxx@xxx.xxx"
-            android:title="xxx" />
-    </PreferenceCategory>
+    <PreferenceCategory android:title="其他说明">
 
+        <Preference
+            android:key="unknown"
+            android:title="当前版本"
+            android:summary="V 1.0"
+            />
+
+        <Preference
+            android:key="unknown"
+            android:title="xxx"
+            android:summary="E-mail: xxx@xxx.xxx"
+            />
+    </PreferenceCategory>
 </PreferenceScreen>

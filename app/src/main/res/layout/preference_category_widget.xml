@@ -3,7 +3,6 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:background="@color/white"
               android:orientation="vertical">
 
     <TextView
@@ -13,7 +12,7 @@
         android:paddingStart="8dp"
         android:paddingTop="16dp"
         android:textColor="@color/colorPrimary"
-        tools:text="indroduce"
+        tools:text="introduce"
         android:textSize="14sp" />
 
 </LinearLayout>
