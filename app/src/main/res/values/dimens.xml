@@ -18,4 +18,6 @@
     <dimen name="button_height_tall">60dp</dimen>
     <dimen name="button_height_normal">40dp</dimen>
     <dimen name="button_height_short">32dp</dimen>
+    <dimen name="root_view_padding">16dp</dimen>
+
 </resources>

@@ -6,6 +6,7 @@
     <string name="button_text_start">Start</string>
     <string name="button_text_save">Save</string>
 
-    <!-- dimens -->
-    <dimen name="root_view_padding">16dp</dimen>
+    <!-- settings -->
+    <string name="title_activity_setting">Settings</string>
+
 </resources>

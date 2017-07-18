@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/settings"
-        android:icon="@drawable/ic_settings_white"
+        android:icon="@drawable/ic_settings_white_32dp"
         android:title="Delete"
         app:showAsAction="ifRoom"/>
 </menu>

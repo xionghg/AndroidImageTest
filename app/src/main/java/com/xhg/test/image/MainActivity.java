@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.xhg.test.image.adapter.MainRecyclerAdapter;
 import com.xhg.test.image.model.StrategyModel;
+import com.xhg.test.image.settings.SettingsActivity;
 import com.xhg.test.image.strategies.ColorStrategy;
 
 import java.util.Arrays;
@@ -107,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Home function is coming soon", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
-                Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                // Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.help:
                 Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
