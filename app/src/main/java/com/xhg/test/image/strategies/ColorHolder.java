@@ -1,11 +1,8 @@
-package com.xhg.test.image;
+package com.xhg.test.image.strategies;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.xhg.test.image.strategies.ColorStrategy;
-import com.xhg.test.image.strategies.Mandelbrot1;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

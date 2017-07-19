@@ -1,4 +1,4 @@
-package com.xhg.test.image.adapter;
+package com.xhg.test.image.pictures;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.xhg.test.image.ColorHolder;
+import com.xhg.test.image.strategies.ColorHolder;
 import com.xhg.test.image.R;
 import com.xhg.test.image.strategies.ColorStrategy;
 
@@ -20,7 +20,7 @@ import java.util.List;
  * @created 2017-07-11.
  */
 
-public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapter.MyViewHolder> {
+public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.MyViewHolder> {
 
     private static final String TAG = "TestBitmap-MainAdapter";
 
@@ -30,9 +30,9 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
     /**
      * 事件回调监听
      */
-    private MainRecyclerAdapter.OnItemClickListener mOnItemClickListener;
+    private PicturesAdapter.OnItemClickListener mOnItemClickListener;
 
-    public MainRecyclerAdapter(Context context, List<ColorStrategy> data) {
+    public PicturesAdapter(Context context, List<ColorStrategy> data) {
         this.mContext = context;
         this.mData = data;
         mInflater = LayoutInflater.from(mContext);
@@ -59,7 +59,7 @@ public class MainRecyclerAdapter extends RecyclerView.Adapter<MainRecyclerAdapte
      *
      * @param listener
      */
-    public void setOnItemClickListener(MainRecyclerAdapter.OnItemClickListener listener) {
+    public void setOnItemClickListener(PicturesAdapter.OnItemClickListener listener) {
         this.mOnItemClickListener = listener;
     }
 

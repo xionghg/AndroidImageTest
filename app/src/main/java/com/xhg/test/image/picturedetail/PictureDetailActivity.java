@@ -1,4 +1,4 @@
-package com.xhg.test.image;
+package com.xhg.test.image.picturedetail;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -17,13 +17,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.xhg.test.image.strategies.ColorHolder;
+import com.xhg.test.image.R;
 import com.xhg.test.image.model.StrategyModel;
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.utils.FileUtils;
 
 import java.util.Locale;
 
-public class BigImageActivity extends AppCompatActivity {
+public class PictureDetailActivity extends AppCompatActivity {
     private static final String TAG = "TestBitmap-BigImage";
 
     private ColorHolder mHolder;
@@ -109,7 +111,7 @@ public class BigImageActivity extends AppCompatActivity {
     private void savePicture() {
         String path = FileUtils.writeBitmapToStorage(mBitmap);
         if (!TextUtils.isEmpty(path)) {
-            Toast.makeText(BigImageActivity.this, "Picture has saved to " + path, Toast.LENGTH_SHORT).show();
+            Toast.makeText(PictureDetailActivity.this, "Picture has saved to " + path, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -122,7 +124,7 @@ public class BigImageActivity extends AppCompatActivity {
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
                 // sees the explanation, try again to request the permission.
-                Toast.makeText(BigImageActivity.this, "Need permission to save picture", Toast.LENGTH_SHORT).show();
+                Toast.makeText(PictureDetailActivity.this, "Need permission to save picture", Toast.LENGTH_SHORT).show();
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
             } else {
@@ -143,7 +145,7 @@ public class BigImageActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     savePicture();
                 } else {
-                    Toast.makeText(BigImageActivity.this, "No permission to save picture, you can grant it in Settins",
+                    Toast.makeText(PictureDetailActivity.this, "No permission to save picture, you can grant it in Settins",
                             Toast.LENGTH_SHORT).show();
                 }
                 break;

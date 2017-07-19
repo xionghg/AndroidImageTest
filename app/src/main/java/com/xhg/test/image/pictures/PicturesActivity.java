@@ -1,4 +1,4 @@
-package com.xhg.test.image;
+package com.xhg.test.image.pictures;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.xhg.test.image.adapter.MainRecyclerAdapter;
+import com.xhg.test.image.picturedetail.PictureDetailActivity;
+import com.xhg.test.image.R;
 import com.xhg.test.image.model.StrategyModel;
 import com.xhg.test.image.settings.SettingsActivity;
 import com.xhg.test.image.strategies.ColorStrategy;
@@ -30,29 +31,29 @@ import java.util.List;
  * @created 2017-07-04.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class PicturesActivity extends AppCompatActivity {
 
     private static final String TAG = "TestBitmap-Main";
 
     private Button mToButton;
     private RecyclerView mRecyclerView;
     private List<ColorStrategy> mStrategies;
-    private MainRecyclerAdapter mRecyclerAdapter;
+    private PicturesAdapter mRecyclerAdapter;
     private StrategyModel mStrategyModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Set up the toolbar.
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            //显示导航按钮
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            //设置图标
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_32dp);
-        }
+        //设置图标
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_32dp);
+        //显示导航按钮
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         initData();
 
@@ -60,26 +61,26 @@ public class MainActivity extends AppCompatActivity {
         mToButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, BigImageActivity.class);
+                Intent intent = new Intent(PicturesActivity.this, PictureDetailActivity.class);
                 intent.putExtra("strategy_index", 4);
                 startActivity(intent);
             }
         });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycle_view);
-        LinearLayoutManager layoutManager = new GridLayoutManager(MainActivity.this, 2, GridLayoutManager.VERTICAL, false);
+        LinearLayoutManager layoutManager = new GridLayoutManager(PicturesActivity.this, 2, GridLayoutManager.VERTICAL, false);
         //设置布局管理器
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerAdapter = new MainRecyclerAdapter(MainActivity.this, mStrategies);
+        mRecyclerAdapter = new PicturesAdapter(PicturesActivity.this, mStrategies);
         //设置Adapter
         mRecyclerView.setAdapter(mRecyclerAdapter);
         //设置增加或删除条目的动画
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerAdapter.setOnItemClickListener(new MainRecyclerAdapter.OnItemClickListener() {
+        mRecyclerAdapter.setOnItemClickListener(new PicturesAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 Log.d(TAG, "onItemClick: position=" + position);
-                Intent intent = new Intent(MainActivity.this, BigImageActivity.class);
+                Intent intent = new Intent(PicturesActivity.this, PictureDetailActivity.class);
                 intent.putExtra("strategy_index", position);
                 startActivity(intent);
             }
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Home function is coming soon", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.settings:
-                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                Intent intent = new Intent(PicturesActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 // Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
                 break;

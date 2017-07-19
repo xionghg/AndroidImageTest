@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".pictures.PicturesActivity"
             android:label="All pictures"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BigImageActivity"
+            android:name=".picturedetail.PictureDetailActivity"
             android:label="Picture detail">
         </activity>
         <activity
