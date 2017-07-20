@@ -1,4 +1,4 @@
-package com.xhg.test.image.model;
+package com.xhg.test.image.data;
 
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.strategies.Mandelbrot1;
@@ -12,24 +12,24 @@ import com.xhg.test.image.strategies.TableCloths;
  * @created 17-7-11.
  */
 
-public class StrategyModel {
+public class StrategyFactory {
 
     private ColorStrategy[] mStrategies;
 
-    private static StrategyModel sModel;
+    private static StrategyFactory INSTANCE;
 
-    public static StrategyModel getInstance() {
-        if (sModel == null) {
-            synchronized (StrategyModel.class) {
-                if (sModel == null) {
-                    sModel = new StrategyModel();
+    public static StrategyFactory getInstance() {
+        if (INSTANCE == null) {
+            synchronized (StrategyFactory.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new StrategyFactory();
                 }
             }
         }
-        return sModel;
+        return INSTANCE;
     }
 
-    private StrategyModel() {
+    private StrategyFactory() {
         init();
     }
 

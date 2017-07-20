@@ -1,31 +1,22 @@
 package com.xhg.test.image.pictures;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.xhg.test.image.data.source.PicturesLoader;
 import com.xhg.test.image.data.source.PicturesRepository;
-import com.xhg.test.image.picturedetail.PictureDetailActivity;
 import com.xhg.test.image.R;
-import com.xhg.test.image.model.StrategyModel;
-import com.xhg.test.image.settings.SettingsActivity;
+import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.strategies.ColorStrategy;
+import com.xhg.test.image.strategies.GeneratorManger;
 import com.xhg.test.image.utils.ActivityUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -42,7 +33,7 @@ public class PicturesActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private List<ColorStrategy> mStrategies;
     private PicturesAdapter mRecyclerAdapter;
-    private StrategyModel mStrategyModel;
+    private StrategyFactory mStrategyModel;
     private PicturesPresenter mPicturesPresenter;
 
     @Override
@@ -106,18 +97,17 @@ public class PicturesActivity extends AppCompatActivity {
         PicturesLoader picturesLoader = new PicturesLoader(getApplicationContext(), repository);
 
         mPicturesPresenter = new PicturesPresenter(
-                picturesLoader,
-                getSupportLoaderManager(),
+                new GeneratorManger(),
                 repository,
                 picturesFragment
         );
 
     }
 
-    private void initData() {
-        mStrategyModel = StrategyModel.getInstance();
-        mStrategies = Arrays.asList(mStrategyModel.getStrategies());
-    }
+//    private void initData() {
+//        mStrategyModel = StrategyModel.getInstance();
+//        mStrategies = Arrays.asList(mStrategyModel.getStrategies());
+//    }
 
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {

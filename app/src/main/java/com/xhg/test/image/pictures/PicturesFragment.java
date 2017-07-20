@@ -157,6 +157,11 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     }
 
     @Override
+    public void showEmptyPictures(int size) {
+
+    }
+
+    @Override
     public void showPictures(List<Picture> Pictures) {
         mAdapter.replaceData(Pictures);
         mPicturesView.setVisibility(View.VISIBLE);

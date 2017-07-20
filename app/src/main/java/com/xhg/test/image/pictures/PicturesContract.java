@@ -22,6 +22,8 @@ public interface PicturesContract {
 
         void showPictures(List<Picture> pictures);
 
+        void showEmptyPictures(int size);
+
         void showPictureDetailsUi(String pictureId);
 
         void showLoadingPicturesError();

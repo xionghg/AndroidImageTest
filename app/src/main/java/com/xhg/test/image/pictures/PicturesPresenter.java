@@ -7,8 +7,11 @@ import android.support.v4.content.Loader;
 import android.util.Log;
 
 import com.xhg.test.image.data.Picture;
+import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.data.source.PicturesLoader;
 import com.xhg.test.image.data.source.PicturesRepository;
+import com.xhg.test.image.strategies.ColorGenerator;
+import com.xhg.test.image.strategies.GeneratorManger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,26 +23,23 @@ import static com.bumptech.glide.util.Preconditions.checkNotNull;
  * @created 17-7-20.
  */
 
-public class PicturesPresenter implements PicturesContract.Presenter, LoaderManager.LoaderCallbacks<List<Picture>> {
+public class PicturesPresenter implements PicturesContract.Presenter, GeneratorManger.GeneratorCallback {
     private static final String TAG = "PicturesPresenter";
 
     private final PicturesRepository mPicturesRepository;
 
     private final PicturesContract.View mPicturesView;
 
-    private final PicturesLoader mLoader;
-
-    private final LoaderManager mLoaderManager;
+    private final GeneratorManger mGeneratorManger;
 
     private List<Picture> mCurrentPictures;
 
     private boolean mFirstLoad;
 
-    public PicturesPresenter(@NonNull PicturesLoader loader, @NonNull LoaderManager loaderManager,
+    public PicturesPresenter(@NonNull GeneratorManger generatorManger,
                              @NonNull PicturesRepository PicturesRepository,
                              @NonNull PicturesContract.View PicturesView) {
-        mLoader = checkNotNull(loader, "loader cannot be null!");
-        mLoaderManager = checkNotNull(loaderManager, "loader manager cannot be null");
+        mGeneratorManger = checkNotNull(generatorManger, "loader manager cannot be null");
         mPicturesRepository = checkNotNull(PicturesRepository, "PicturesRepository cannot be null");
         mPicturesView = checkNotNull(PicturesView, "PicturesView cannot be null!");
 
@@ -48,7 +48,7 @@ public class PicturesPresenter implements PicturesContract.Presenter, LoaderMana
 
     @Override
     public void start() {
-        mLoaderManager.initLoader(0, null, this);
+        mGeneratorManger.initGenerator(this);
     }
 
     @Override
@@ -57,19 +57,43 @@ public class PicturesPresenter implements PicturesContract.Presenter, LoaderMana
     }
 
     @Override
-    public Loader<List<Picture>> onCreateLoader(int id, Bundle args) {
+    public void onGenerateStart(int size) {
+        mPicturesView.showEmptyPictures(size);
+    }
+
+    @Override
+    public ColorGenerator onCreateGenerator(int index, Bundle args) {
         Log.e(TAG, "onCreateLoader: ");
         mPicturesView.setLoadingIndicator(true);
-        return mLoader;
+        ColorGenerator colorGenerator = new ColorGenerator(512, 512);
+        colorGenerator.setStrategy(StrategyFactory.getInstance().getStrategy(index))
+                .setCallback(new ColorGenerator.SimpleCallback() {
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onProgressUpdate(int progress) {
+
+                    }
+
+                    @Override
+                    public void onColorsCreated() {
+
+                    }
+
+                });
+        return colorGenerator;
     }
 
 
     @Override
-    public void onLoadFinished(Loader<List<Picture>> loader, List<Picture> data) {
+    public void onGenerateFinished(ColorGenerator generator, Picture data) {
         Log.e(TAG, "onLoadFinished: ");
         mPicturesView.setLoadingIndicator(false);
 
-        mCurrentPictures = data;
+        mCurrentPictures.add(data);
         if (mCurrentPictures == null) {
             mPicturesView.showLoadingPicturesError();
         } else {
@@ -87,14 +111,6 @@ public class PicturesPresenter implements PicturesContract.Presenter, LoaderMana
         processPictures(PicturesToDisplay);
     }
 
-    @Override
-    public void onLoaderReset(Loader<List<Picture>> loader) {
-        Log.e(TAG, "onLoaderReset: ");
-    }
-
-    /**
-     * @param forceUpdate Pass in true to refresh the data in the {@link PicturesDataSource}
-     */
     public void loadPictures(boolean forceUpdate) {
         if (forceUpdate || mFirstLoad) {
             mFirstLoad = false;

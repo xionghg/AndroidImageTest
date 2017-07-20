@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
-import com.xhg.test.image.strategies.ColorHolder;
+import com.xhg.test.image.strategies.ColorGenerator;
 
 import java.util.List;
 
@@ -61,9 +61,9 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
     @Override
     public void onBindViewHolder(final PicturesViewHolder holder,
                                  final int position) {
-        final ColorHolder colorHolder = new ColorHolder(504, 504);
+        final ColorGenerator colorHolder = new ColorGenerator(504, 504);
         colorHolder.setStrategy(mPictures.get(position).getStrategy());
-        colorHolder.setCallback(new ColorHolder.SimpleCallback() {
+        colorHolder.setCallback(new ColorGenerator.SimpleCallback() {
             @Override
             public void onColorsCreated() {
                 holder.imageView.setImageBitmap(colorHolder.createBitmap());

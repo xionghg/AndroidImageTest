@@ -17,9 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.xhg.test.image.strategies.ColorHolder;
+import com.xhg.test.image.strategies.ColorGenerator;
 import com.xhg.test.image.R;
-import com.xhg.test.image.model.StrategyModel;
+import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.utils.FileUtils;
 
@@ -28,14 +28,14 @@ import java.util.Locale;
 public class PictureDetailActivity extends AppCompatActivity {
     private static final String TAG = "TestBitmap-BigImage";
     public static final String  EXTRA_PICTURE_ID = "extra_picture_id";
-    private ColorHolder mHolder;
+    private ColorGenerator mHolder;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
     private TextView mProgressTextView;
     private Button mStartButton;
     private Button mSaveButton;
     private Bitmap mBitmap;
-    private StrategyModel mStrategyModel;
+    private StrategyFactory mStrategyModel;
     private ColorStrategy mStrategy;
 
     @Override
@@ -49,13 +49,13 @@ public class PictureDetailActivity extends AppCompatActivity {
     private void initData() {
         Log.d(TAG, "initData");
         int index = getIntent().getIntExtra(EXTRA_PICTURE_ID, 0);
-        mStrategyModel = StrategyModel.getInstance();
+        mStrategyModel = StrategyFactory.getInstance();
         mStrategy = mStrategyModel.getStrategy(index);
 
-        mHolder = new ColorHolder();
+        mHolder = new ColorGenerator();
         // init mHolder and start
         mHolder.setStrategy(mStrategy)
-                .setCallback(new ColorHolder.SimpleCallback() {
+                .setCallback(new ColorGenerator.SimpleCallback() {
                     @Override
                     public void onStart() {
                         mStartButton.setEnabled(false);

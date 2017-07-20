@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @created 2017-07-04.
  */
 
-public class ColorHolder {
+public class ColorGenerator {
 
     private static final String TAG = "ColorHolder";
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
@@ -29,11 +29,11 @@ public class ColorHolder {
     private volatile Status mStatus = Status.PENDING;
     private int[] mProgress;
 
-    public ColorHolder() {
+    public ColorGenerator() {
         this(1024, 1024);
     }
 
-    public ColorHolder(int width, int height) {
+    public ColorGenerator(int width, int height) {
         if (numberWrong(width) || numberWrong(height)) {
             throw new IllegalArgumentException("params not right");
         }
@@ -143,7 +143,7 @@ public class ColorHolder {
         return mStrategy;
     }
 
-    public ColorHolder setStrategy(ColorStrategy strategy) {
+    public ColorGenerator setStrategy(ColorStrategy strategy) {
         mStrategy = strategy;
         return this;
     }
@@ -152,7 +152,7 @@ public class ColorHolder {
         return mCallback;
     }
 
-    public ColorHolder setCallback(Callback callback) {
+    public ColorGenerator setCallback(Callback callback) {
         mCallback = callback;
         return this;
     }
@@ -191,7 +191,7 @@ public class ColorHolder {
          */
         RUNNING,
         /**
-         * Indicates that {@link ColorHolder#createBitmap} has finished.
+         * Indicates that {@link ColorGenerator#createBitmap} has finished.
          */
         FINISHED,
     }
@@ -223,7 +223,7 @@ public class ColorHolder {
     }
 
     /**
-     * An implementation of {@link ColorHolder.Callback} that has empty method bodies and
+     * An implementation of {@link ColorGenerator.Callback} that has empty method bodies and
      * default return values.
      */
     public static class SimpleCallback implements Callback {
