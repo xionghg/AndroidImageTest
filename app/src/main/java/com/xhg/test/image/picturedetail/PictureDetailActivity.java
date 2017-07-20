@@ -27,7 +27,7 @@ import java.util.Locale;
 
 public class PictureDetailActivity extends AppCompatActivity {
     private static final String TAG = "TestBitmap-BigImage";
-
+    public static final String  EXTRA_PICTURE_ID = "extra_picture_id";
     private ColorHolder mHolder;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
@@ -48,7 +48,7 @@ public class PictureDetailActivity extends AppCompatActivity {
 
     private void initData() {
         Log.d(TAG, "initData");
-        int index = getIntent().getIntExtra("strategy_index", 0);
+        int index = getIntent().getIntExtra(EXTRA_PICTURE_ID, 0);
         mStrategyModel = StrategyModel.getInstance();
         mStrategy = mStrategyModel.getStrategy(index);
 

@@ -1,6 +1,5 @@
 package com.xhg.test.image.pictures;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.xhg.test.image.strategies.ColorHolder;
 import com.xhg.test.image.R;
-import com.xhg.test.image.strategies.ColorStrategy;
+import com.xhg.test.image.data.Picture;
+import com.xhg.test.image.strategies.ColorHolder;
 
 import java.util.List;
 
@@ -20,59 +19,50 @@ import java.util.List;
  * @created 2017-07-11.
  */
 
-public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.MyViewHolder> {
+public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.PicturesViewHolder> {
 
     private static final String TAG = "TestBitmap-MainAdapter";
 
-    private List<ColorStrategy> mData;
-    private Context mContext;
-    private LayoutInflater mInflater;
-    /**
-     * 事件回调监听
-     */
-    private PicturesAdapter.OnItemClickListener mOnItemClickListener;
+    private List<Picture> mPictures;
 
-    public PicturesAdapter(Context context, List<ColorStrategy> data) {
-        this.mContext = context;
-        this.mData = data;
-        mInflater = LayoutInflater.from(mContext);
+    private OnItemClickListener mOnItemClickListener;
+
+    public PicturesAdapter(List<Picture> pictures, OnItemClickListener onItemClickListener) {
+        this.mPictures = pictures;
+        this.mOnItemClickListener = onItemClickListener;
     }
 
-    public void updateData(List<ColorStrategy> data) {
-        this.mData = data;
-        Log.d(TAG, "updateData: size=" + mData.size());
+    public void replaceData(List<Picture> data) {
+        this.mPictures = data;
+        Log.d(TAG, "updateData: size=" + mPictures.size());
         notifyDataSetChanged();
-    }
-
-    public void addItem(int position, ColorStrategy colorStrategy) {
-        mData.add(position, colorStrategy);
-        notifyItemInserted(position);
-    }
-
-    public void removeItem(int position) {
-        mData.remove(position);
-        notifyItemRemoved(position);
-    }
-
-    /**
-     * 设置回调监听
-     *
-     * @param listener
-     */
-    public void setOnItemClickListener(PicturesAdapter.OnItemClickListener listener) {
-        this.mOnItemClickListener = listener;
     }
 
     @Override
     public int getItemCount() {
-        return mData == null ? 0 : mData.size();
+        return mPictures == null ? 0 : mPictures.size();
+    }
+
+    public void addItem(int position, Picture picture) {
+        mPictures.add(position, picture);
+        notifyItemInserted(position);
+    }
+
+    public void removeItem(int position) {
+        mPictures.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
     }
 
     //填充onCreateViewHolder方法返回的holder中的控件
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
+    public void onBindViewHolder(final PicturesViewHolder holder,
+                                 final int position) {
         final ColorHolder colorHolder = new ColorHolder(504, 504);
-        colorHolder.setStrategy(mData.get(position));
+        colorHolder.setStrategy(mPictures.get(position).getStrategy());
         colorHolder.setCallback(new ColorHolder.SimpleCallback() {
             @Override
             public void onColorsCreated() {
@@ -83,29 +73,28 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.MyView
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                if(mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(holder.imageView, position);
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClick(mPictures.get(position));
                 }
             }
         });
     }
 
-    //重写onCreateViewHolder方法，返回一个自定义的ViewHolder
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.recycler_item, parent, false);
-        return new MyViewHolder(view);
+    public PicturesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).
+                inflate(R.layout.recycler_item, parent, false);
+        return new PicturesViewHolder(view);
     }
 
     public interface OnItemClickListener {
-        void onItemClick(View view, int position);
-        void onItemLongClick(View view, int position);
+        void onItemClick(Picture picture);
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder {
+    static class PicturesViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
 
-        public MyViewHolder(View view) {
+        public PicturesViewHolder(View view) {
             super(view);
             imageView = (ImageView) view.findViewById(R.id.image);
         }

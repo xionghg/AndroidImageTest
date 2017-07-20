@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.xhg.test.image.strategies.ColorStrategy;
+
 /**
  * @author xionghg
  * @email xiong9394@gmail.com
@@ -18,6 +20,8 @@ public class Picture {
     private String mDescription;
 
     private boolean mCompleted;
+
+    private ColorStrategy mStrategy;
 
     private Bitmap mBitmap;
 
@@ -37,5 +41,9 @@ public class Picture {
 
     public Bitmap getBitmap() {
         return mBitmap;
+    }
+
+    public ColorStrategy getStrategy() {
+        return mStrategy;
     }
 }

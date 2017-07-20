@@ -19,33 +19,61 @@
             app:layout_scrollFlags="scroll|enterAlways|snap"/>
 
     </android.support.design.widget.AppBarLayout>
-
-    <RelativeLayout
+    <FrameLayout
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:padding="@dimen/spacing_tiny" >
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycle_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/recycle_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent" />-->
 
-        <LinearLayout
-            android:id="@+id/bottom_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:orientation="horizontal">
+        <!--<LinearLayout-->
+            <!--android:id="@+id/bottom_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:orientation="horizontal">-->
 
-            <Button
-                android:id="@+id/to_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_text_start"
-                android:textAllCaps="false" />
-        </LinearLayout>
+            <!--<Button-->
+                <!--android:id="@+id/to_button"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/button_text_start"-->
+                <!--android:textAllCaps="false" />-->
+        <!--</LinearLayout>-->
 
-    </RelativeLayout>
+    </FrameLayout>
+    <!--<RelativeLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
+        <!--android:padding="@dimen/spacing_tiny" >-->
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/recycle_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent" />-->
+
+        <!--<LinearLayout-->
+            <!--android:id="@+id/bottom_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--android:orientation="horizontal">-->
+
+            <!--<Button-->
+                <!--android:id="@+id/to_button"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/button_text_start"-->
+                <!--android:textAllCaps="false" />-->
+        <!--</LinearLayout>-->
+
+    <!--</RelativeLayout>-->
 </android.support.design.widget.CoordinatorLayout>

@@ -22,17 +22,11 @@ public interface PicturesContract {
 
         void showPictures(List<Picture> tasks);
 
-        void showAddPicture();
-
         void showPictureDetailsUi(String taskId);
 
-        void showLoadingPictureError();
+        void showLoadingPicturesError();
 
         void showNoPictures();
-
-        // void showSuccessfullySavedMessage();
-
-        // void showFilteringPopUpMenu();
     }
 
     interface Presenter extends BasePresenter {
@@ -40,8 +34,6 @@ public interface PicturesContract {
         void result(int requestCode, int resultCode);
 
         void loadPictures(boolean forceUpdate);
-
-        void addNewPicture();
 
         void openPictureDetails(@NonNull Picture requestedTask);
     }
