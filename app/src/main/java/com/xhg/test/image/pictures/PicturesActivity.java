@@ -102,7 +102,7 @@ public class PicturesActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        PicturesRepository repository = PicturesRepository.provideTasksRepository(getApplicationContext());
+        PicturesRepository repository = PicturesRepository.providePicturesRepository(getApplicationContext());
         PicturesLoader picturesLoader = new PicturesLoader(getApplicationContext(), repository);
 
         mPicturesPresenter = new PicturesPresenter(

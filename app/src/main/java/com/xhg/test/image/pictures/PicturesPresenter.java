@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
 
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.source.PicturesLoader;
@@ -20,6 +21,7 @@ import static com.bumptech.glide.util.Preconditions.checkNotNull;
  */
 
 public class PicturesPresenter implements PicturesContract.Presenter, LoaderManager.LoaderCallbacks<List<Picture>> {
+    private static final String TAG = "PicturesPresenter";
 
     private final PicturesRepository mPicturesRepository;
 
@@ -56,6 +58,7 @@ public class PicturesPresenter implements PicturesContract.Presenter, LoaderMana
 
     @Override
     public Loader<List<Picture>> onCreateLoader(int id, Bundle args) {
+        Log.e(TAG, "onCreateLoader: ");
         mPicturesView.setLoadingIndicator(true);
         return mLoader;
     }
@@ -63,6 +66,7 @@ public class PicturesPresenter implements PicturesContract.Presenter, LoaderMana
 
     @Override
     public void onLoadFinished(Loader<List<Picture>> loader, List<Picture> data) {
+        Log.e(TAG, "onLoadFinished: ");
         mPicturesView.setLoadingIndicator(false);
 
         mCurrentPictures = data;
@@ -85,7 +89,7 @@ public class PicturesPresenter implements PicturesContract.Presenter, LoaderMana
 
     @Override
     public void onLoaderReset(Loader<List<Picture>> loader) {
-        // no-op
+        Log.e(TAG, "onLoaderReset: ");
     }
 
     /**

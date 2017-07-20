@@ -13,17 +13,34 @@ import com.xhg.test.image.strategies.ColorStrategy;
  */
 
 public class Picture {
+
     @NonNull
     private String mId;
 
     @Nullable
-    private String mDescription;
+    private final String mTitle;
 
-    private boolean mCompleted;
+    @Nullable
+    private String mDescription;
 
     private ColorStrategy mStrategy;
 
     private Bitmap mBitmap;
+
+    public Picture(String title, String description) {
+        mTitle = title;
+        mDescription = description;
+    }
+
+    public Picture(String title, String description, String id) {
+        mTitle = title;
+        mDescription = description;
+        mId = id;
+    }
+
+    public void recyvle() {
+        mBitmap = null;
+    }
 
     @NonNull
     public String getId() {
@@ -31,12 +48,13 @@ public class Picture {
     }
 
     @Nullable
-    public String getDescription() {
-        return mDescription;
+    public String getTitle() {
+        return mTitle;
     }
 
-    public boolean isCompleted() {
-        return mCompleted;
+    @Nullable
+    public String getDescription() {
+        return mDescription;
     }
 
     public Bitmap getBitmap() {

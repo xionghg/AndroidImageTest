@@ -20,9 +20,9 @@ public interface PicturesContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showPictures(List<Picture> tasks);
+        void showPictures(List<Picture> pictures);
 
-        void showPictureDetailsUi(String taskId);
+        void showPictureDetailsUi(String pictureId);
 
         void showLoadingPicturesError();
 
@@ -35,6 +35,6 @@ public interface PicturesContract {
 
         void loadPictures(boolean forceUpdate);
 
-        void openPictureDetails(@NonNull Picture requestedTask);
+        void openPictureDetails(@NonNull Picture requestedPicture);
     }
 }
