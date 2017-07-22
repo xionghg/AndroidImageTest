@@ -4,6 +4,9 @@ import android.os.Bundle;
 
 import com.xhg.test.image.data.Picture;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author xionghg
  * @email xiong9394@gmail.com
@@ -11,6 +14,25 @@ import com.xhg.test.image.data.Picture;
  */
 
 public class GeneratorManger {
+
+    private static GeneratorManger INSTANCE;
+
+    private List<ColorGenerator> mWorkingGenerators;
+
+    public static GeneratorManger getInstance() {
+        if (INSTANCE == null) {
+            synchronized (GeneratorManger.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new GeneratorManger();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private GeneratorManger() {
+        mWorkingGenerators = new ArrayList<>();
+    }
 
     private GeneratorCallback mGeneratorCallback;
 
@@ -23,17 +45,17 @@ public class GeneratorManger {
         void onGenerateFinished(ColorGenerator generator, Picture data);
     }
 
-    public GeneratorManger() {
-
-    }
-
     public void initGenerator(GeneratorCallback callback) {
         mGeneratorCallback = callback;
         start();
     }
 
-    private void start() {
+    public void start() {
 
+    }
+
+    public boolean isWorking() {
+        return mWorkingGenerators!= null && mWorkingGenerators.size() > 0;
     }
 
 }

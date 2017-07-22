@@ -28,7 +28,8 @@ import com.xhg.test.image.picturedetail.PictureDetailActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bumptech.glide.util.Preconditions.checkNotNull;
+import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+
 
 /**
  * @author xionghg

@@ -18,6 +18,7 @@ import com.xhg.test.image.strategies.GeneratorManger;
 import com.xhg.test.image.utils.ActivityUtils;
 
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
  * @author xionghg
@@ -49,8 +50,6 @@ public class PicturesActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_32dp);
         //显示导航按钮
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        // initData();
 
 //        mToButton = (Button) findViewById(R.id.to_button);
 //        mToButton.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +96,7 @@ public class PicturesActivity extends AppCompatActivity {
         PicturesLoader picturesLoader = new PicturesLoader(getApplicationContext(), repository);
 
         mPicturesPresenter = new PicturesPresenter(
-                new GeneratorManger(),
+                GeneratorManger.getInstance(),
                 repository,
                 picturesFragment
         );

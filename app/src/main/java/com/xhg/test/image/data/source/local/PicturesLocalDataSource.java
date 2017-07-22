@@ -13,7 +13,8 @@ import com.xhg.test.image.data.source.local.PicturesPersistenceContract.PictureE
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.bumptech.glide.util.Preconditions.checkNotNull;
+import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+
 
 /**
  * Concrete implementation of a data source as a db.

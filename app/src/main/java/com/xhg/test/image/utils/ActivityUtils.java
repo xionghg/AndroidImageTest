@@ -5,7 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import static com.bumptech.glide.util.Preconditions.checkNotNull;
+import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+
 
 /**
  * @author xionghg

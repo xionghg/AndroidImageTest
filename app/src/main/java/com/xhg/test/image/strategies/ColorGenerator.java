@@ -17,7 +17,9 @@ public class ColorGenerator {
     private static final String TAG = "ColorHolder";
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
+    private static AtomicInteger sId = new AtomicInteger(1);
 
+    private String mName;
     private int mHeight;
     private int mWidth;
     private ColorStrategy mStrategy;
@@ -29,21 +31,60 @@ public class ColorGenerator {
     private volatile Status mStatus = Status.PENDING;
     private int[] mProgress;
 
-    public ColorGenerator() {
-        this(1024, 1024);
-    }
-
-    public ColorGenerator(int width, int height) {
+    public void setWidthAndHeight(int width, int height) {
         if (numberWrong(width) || numberWrong(height)) {
             throw new IllegalArgumentException("params not right");
         }
-        setWidthAndHeight(width, height);
-    }
-
-    public void setWidthAndHeight(int width, int height) {
         this.mWidth = width;
         this.mHeight = height;
         mColorArray = new int[width * height];
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        this.mName = name;
+    }
+
+    private ColorGenerator(Builder builder) {
+        setName(builder.name);
+        setCallback(builder.callback);
+        setWidthAndHeight(builder.width, builder.height);
+        setStrategy(builder.colorStrategy);
+    }
+
+    public static class Builder {
+        private int    width   = 1024;
+        private int    height  = 1024;
+        private String name    = null;
+        private ColorStrategy colorStrategy;
+        private Callback callback;
+
+        public Builder(String name, Callback callback) {
+            this.name = name;
+            this.callback = callback;
+        }
+
+        public Builder setWidth(int width) {
+            this.width = width;
+            return this;
+        }
+
+        public Builder setHeight(int height) {
+            this.height = height;
+            return this;
+        }
+
+        public Builder setColorStrategy(ColorStrategy colorStrategy) {
+            this.colorStrategy = colorStrategy;
+            return this;
+        }
+
+        public ColorGenerator build() { // 构建，返回一个新对象
+            return new ColorGenerator(this);
+        }
     }
 
     private boolean numberWrong(int number) {
