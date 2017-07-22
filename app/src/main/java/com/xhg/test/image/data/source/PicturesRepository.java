@@ -24,16 +24,13 @@ import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
 public class PicturesRepository implements PicturesDataSource {
 
     private static PicturesRepository INSTANCE;
-
     private final PicturesDataSource mPicturesGenerateDataSource;
-
     private final PicturesDataSource mPicturesLocalDataSource;
+    private Map<String, Picture> mCachedPictures;
+    private boolean mCacheIsDirty;
 
-    Map<String, Picture> mCachedPictures;
-
-    boolean mCacheIsDirty;
-
-    private List<PicturesRepositoryObserver> mObservers = new ArrayList<PicturesRepositoryObserver>();
+    private List<PicturesRepositoryObserver> mObservers = new ArrayList<>();
+    private List<LoadCallback> mCallbacks = new ArrayList<>();
 
     private PicturesRepository(PicturesDataSource picturesGenerateDataSource,
                                PicturesDataSource picturesLocalDataSource) {
@@ -63,24 +60,6 @@ public class PicturesRepository implements PicturesDataSource {
 
     public static void destroyInstance() {
         INSTANCE = null;
-    }
-
-    public void addContentObserver(PicturesRepositoryObserver observer) {
-        if (!mObservers.contains(observer)) {
-            mObservers.add(observer);
-        }
-    }
-
-    public void removeContentObserver(PicturesRepositoryObserver observer) {
-        if (mObservers.contains(observer)) {
-            mObservers.remove(observer);
-        }
-    }
-
-    private void notifyContentObserver() {
-        for (PicturesRepositoryObserver observer : mObservers) {
-            observer.onPicturesChanged();
-        }
     }
 
     public List<Picture> getPictures() {
@@ -114,10 +93,6 @@ public class PicturesRepository implements PicturesDataSource {
 
     public List<Picture> getCachedPictures() {
         return mCachedPictures == null ? null : new ArrayList<>(mCachedPictures.values());
-    }
-
-    public Picture getCachedPicture(String pictureId) {
-        return mCachedPictures.get(pictureId);
     }
 
     private void savePicturesInLocalDataSource(List<Picture> pictures) {
@@ -157,7 +132,8 @@ public class PicturesRepository implements PicturesDataSource {
         mCachedPictures.put(picture.getId(), picture);
 
         // Update the UI
-        notifyContentObserver();
+        // notifyContentObserver();
+        notifyLoadOneFinished(picture);
     }
 
     public Picture getPicture(@NonNull final String pictureId) {
@@ -199,12 +175,10 @@ public class PicturesRepository implements PicturesDataSource {
     public void deleteAllPictures() {
         mPicturesGenerateDataSource.deleteAllPictures();
         mPicturesLocalDataSource.deleteAllPictures();
-
         if (mCachedPictures == null) {
             mCachedPictures = new LinkedHashMap<>();
         }
         mCachedPictures.clear();
-
         // Update the UI
         notifyContentObserver();
     }
@@ -213,16 +187,59 @@ public class PicturesRepository implements PicturesDataSource {
     public void deletePicture(@NonNull String PictureId) {
         mPicturesGenerateDataSource.deletePicture(checkNotNull(PictureId));
         mPicturesLocalDataSource.deletePicture(checkNotNull(PictureId));
-
         mCachedPictures.remove(PictureId);
-
         // Update the UI
         notifyContentObserver();
     }
 
+    public void addContentObserver(PicturesRepositoryObserver observer) {
+        if (!mObservers.contains(observer)) {
+            mObservers.add(observer);
+        }
+    }
+
+    public void removeContentObserver(PicturesRepositoryObserver observer) {
+        if (mObservers.contains(observer)) {
+            mObservers.remove(observer);
+        }
+    }
+
+    private void notifyContentObserver() {
+        for (PicturesRepositoryObserver observer : mObservers) {
+            observer.onPicturesChanged();
+        }
+    }
+
+    public void addLoadCallback (LoadCallback callback) {
+        if (!mCallbacks.contains(callback)) {
+            mCallbacks.add(callback);
+        }
+    }
+
+    public void removeLoadCallback(LoadCallback callback) {
+        if (mCallbacks.contains(callback)) {
+            mCallbacks.remove(callback);
+        }
+    }
+
+    private void notifyLoadOneFinished(Picture picture) {
+        for (LoadCallback callback : mCallbacks) {
+            callback.onLoadOneFinished(picture);
+        }
+    }
+
+    private void notifyRefreshAllFinished(List<Picture> datas) {
+        for (LoadCallback callback : mCallbacks) {
+            callback.onRefreshAllFinished(datas);
+        }
+    }
+
     public interface PicturesRepositoryObserver {
-
         void onPicturesChanged();
+    }
 
+    public interface LoadCallback<T> {
+        void onLoadOneFinished(T data);
+        void onRefreshAllFinished(List<T> datas);
     }
 }

@@ -1,5 +1,6 @@
 package com.xhg.test.image.pictures;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,9 +44,20 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
         return mPictures == null ? 0 : mPictures.size();
     }
 
+    public void addItem(Picture picture) {
+        int position = getItemCount();
+        addItem(position, picture);
+    }
+
     public void addItem(int position, Picture picture) {
         mPictures.add(position, picture);
         notifyItemInserted(position);
+    }
+
+    public void changeItem(int position, Picture picture) {
+        mPictures.set(position, picture);
+        //notifyItemChanged(position);
+        notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
@@ -61,20 +73,25 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
     @Override
     public void onBindViewHolder(final PicturesViewHolder holder,
                                  final int position) {
-        final ColorGenerator colorHolder = new ColorGenerator(504, 504);
-        colorHolder.setStrategy(mPictures.get(position).getStrategy());
-        colorHolder.setCallback(new ColorGenerator.SimpleCallback() {
-            @Override
-            public void onColorsCreated() {
-                holder.imageView.setImageBitmap(colorHolder.createBitmap());
-            }
-        }).startInParallel();
-
+//        final ColorGenerator colorHolder = new ColorGenerator(504, 504);
+//        colorHolder.setStrategy(mPictures.get(position).getStrategy());
+//        colorHolder.setCallback(new ColorGenerator.SimpleCallback() {
+//            @Override
+//            public void onColorsCreated() {
+//                holder.imageView.setImageBitmap(colorHolder.createBitmap());
+//            }
+//        }).startInParallel();
+        Log.e(TAG, "onBindViewHolder: ");
+        Bitmap bitmap = mPictures.get(position).getBitmap();
+        if (bitmap != null) {
+            Log.e(TAG, "onBindViewHolder: bitmap not null");
+            holder.imageView.setImageBitmap(bitmap);
+        }
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(mPictures.get(position));
+                    mOnItemClickListener.onItemClick(position, mPictures.get(position));
                 }
             }
         });
@@ -88,7 +105,7 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Picture picture);
+        void onItemClick(int position, Picture picture);
     }
 
     static class PicturesViewHolder extends RecyclerView.ViewHolder {

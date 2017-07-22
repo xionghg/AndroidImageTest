@@ -63,9 +63,7 @@ public class PicturesLocalDataSource implements PicturesDataSource {
                             .getString(c.getColumnIndexOrThrow(PictureEntry.COLUMN_NAME_ENTRY_ID));
                     String title = c
                             .getString(c.getColumnIndexOrThrow(PictureEntry.COLUMN_NAME_TITLE));
-                    String description =
-                            c.getString(c.getColumnIndexOrThrow(PictureEntry.COLUMN_NAME_DESCRIPTION));
-                    Picture Picture = new Picture(title, description, itemId);
+                    Picture Picture = new Picture(itemId, title);
                     Pictures.add(Picture);
                 }
             }
@@ -105,9 +103,7 @@ public class PicturesLocalDataSource implements PicturesDataSource {
                 String itemId = c
                         .getString(c.getColumnIndexOrThrow(PictureEntry.COLUMN_NAME_ENTRY_ID));
                 String title = c.getString(c.getColumnIndexOrThrow(PictureEntry.COLUMN_NAME_TITLE));
-                String description =
-                        c.getString(c.getColumnIndexOrThrow(PictureEntry.COLUMN_NAME_DESCRIPTION));
-                Picture = new Picture(title, description, itemId);
+                Picture = new Picture(itemId, title);
             }
             if (c != null) {
                 c.close();
@@ -128,7 +124,6 @@ public class PicturesLocalDataSource implements PicturesDataSource {
             ContentValues values = new ContentValues();
             values.put(PictureEntry.COLUMN_NAME_ENTRY_ID, Picture.getId());
             values.put(PictureEntry.COLUMN_NAME_TITLE, Picture.getTitle());
-            values.put(PictureEntry.COLUMN_NAME_DESCRIPTION, Picture.getDescription());
 
             mDb.insert(PictureEntry.TABLE_NAME, null, values);
         } catch (IllegalStateException e) {

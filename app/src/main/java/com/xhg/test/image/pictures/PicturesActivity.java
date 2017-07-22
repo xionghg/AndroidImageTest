@@ -28,13 +28,6 @@ import java.util.concurrent.Executors;
 
 public class PicturesActivity extends AppCompatActivity {
 
-    private static final String TAG = "TestBitmap-Main";
-
-    private Button mToButton;
-    private RecyclerView mRecyclerView;
-    private List<ColorStrategy> mStrategies;
-    private PicturesAdapter mRecyclerAdapter;
-    private StrategyFactory mStrategyModel;
     private PicturesPresenter mPicturesPresenter;
 
     @Override
@@ -51,38 +44,7 @@ public class PicturesActivity extends AppCompatActivity {
         //显示导航按钮
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-//        mToButton = (Button) findViewById(R.id.to_button);
-//        mToButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(PicturesActivity.this, PictureDetailActivity.class);
-//                intent.putExtra("strategy_index", 4);
-//                startActivity(intent);
-//            }
-//        });
 
-//        mRecyclerView = (RecyclerView) findViewById(R.id.recycle_view);
-//        LinearLayoutManager layoutManager = new GridLayoutManager(PicturesActivity.this, 2, GridLayoutManager.VERTICAL, false);
-//        //设置布局管理器
-//        mRecyclerView.setLayoutManager(layoutManager);
-//        mRecyclerAdapter = new PicturesAdapter(PicturesActivity.this, mStrategies);
-//        //设置Adapter
-//        mRecyclerView.setAdapter(mRecyclerAdapter);
-//        //设置增加或删除条目的动画
-//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-//        mRecyclerAdapter.setOnItemClickListener(new PicturesAdapter.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//                Log.d(TAG, "onItemClick: position=" + position);
-//                Intent intent = new Intent(PicturesActivity.this, PictureDetailActivity.class);
-//                intent.putExtra("strategy_index", position);
-//                startActivity(intent);
-//            }
-//
-//            @Override
-//            public void onItemLongClick(View view, int position) {
-//            }
-//        });
         PicturesFragment picturesFragment =
                 (PicturesFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         if (picturesFragment == null) {
@@ -93,26 +55,12 @@ public class PicturesActivity extends AppCompatActivity {
 
         // Create the presenter
         PicturesRepository repository = PicturesRepository.providePicturesRepository(getApplicationContext());
-        PicturesLoader picturesLoader = new PicturesLoader(getApplicationContext(), repository);
 
         mPicturesPresenter = new PicturesPresenter(
-                GeneratorManger.getInstance(),
                 repository,
                 picturesFragment
         );
-
     }
-
-//    private void initData() {
-//        mStrategyModel = StrategyModel.getInstance();
-//        mStrategies = Arrays.asList(mStrategyModel.getStrategies());
-//    }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.toolbar, menu);
-//        return true;
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -120,14 +68,6 @@ public class PicturesActivity extends AppCompatActivity {
             case android.R.id.home:
                 Toast.makeText(this, "Home function is coming soon", Toast.LENGTH_SHORT).show();
                 break;
-//            case R.id.settings:
-//                Intent intent = new Intent(PicturesActivity.this, SettingsActivity.class);
-//                startActivity(intent);
-//                // Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
-//                break;
-//            case R.id.help:
-//                Toast.makeText(this, "To be coming soon", Toast.LENGTH_SHORT).show();
-//                break;
             default:
                 break;
         }

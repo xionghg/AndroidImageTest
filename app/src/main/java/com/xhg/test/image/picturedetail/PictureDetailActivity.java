@@ -51,35 +51,32 @@ public class PictureDetailActivity extends AppCompatActivity {
         int index = getIntent().getIntExtra(EXTRA_PICTURE_ID, 0);
         mStrategyModel = StrategyFactory.getInstance();
         mStrategy = mStrategyModel.getStrategy(index);
+        ColorGenerator.Callback callback = new ColorGenerator.SimpleCallback() {
+            @Override
+            public void onStart() {
+                mStartButton.setEnabled(false);
+                mSaveButton.setEnabled(false);
+                mProgressBar.setProgress(0);
+                mProgressTextView.setText(R.string.no_progress);
+                mImageView.setImageDrawable(getResources().getDrawable(R.drawable.empty_image_300dp));
+            }
 
-        mHolder = new ColorGenerator();
-        // init mHolder and start
-        mHolder.setStrategy(mStrategy)
-                .setCallback(new ColorGenerator.SimpleCallback() {
-                    @Override
-                    public void onStart() {
-                        mStartButton.setEnabled(false);
-                        mSaveButton.setEnabled(false);
-                        mProgressBar.setProgress(0);
-                        mProgressTextView.setText(R.string.no_progress);
-                        mImageView.setImageDrawable(getResources().getDrawable(R.drawable.empty_image_300dp));
-                    }
+            @Override
+            public void onProgressUpdate(int progress) {
+                updateProgress(progress);
+            }
 
-                    @Override
-                    public void onProgressUpdate(int progress) {
-                        updateProgress(progress);
-                    }
-
-                    @Override
-                    public void onColorsCreated() {
-                        Log.d(TAG, "ColorHolder: set color end");
-                        mBitmap = mHolder.createBitmap();
-                        Log.d(TAG, "ColorHolder: create image end");
-                        mImageView.setImageBitmap(mBitmap);
-                        mStartButton.setEnabled(true);
-                        mSaveButton.setEnabled(true);
-                    }
-                });
+            @Override
+            public void onColorsCreated(Bitmap bitmap) {
+                Log.d(TAG, "ColorHolder: set color end");
+                mImageView.setImageBitmap(bitmap);
+                mStartButton.setEnabled(true);
+                mSaveButton.setEnabled(true);
+            }
+        };
+        mHolder = new ColorGenerator.Builder(callback)
+                .setColorStrategy(mStrategy)
+                .build();
     }
 
     private void updateProgress(int progress) {

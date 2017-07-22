@@ -14,22 +14,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ColorGenerator {
 
-    private static final String TAG = "ColorHolder";
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final String TAG = "ColorHolder";
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
     private static AtomicInteger sId = new AtomicInteger(1);
-
+    private final AtomicInteger resultCount = new AtomicInteger(0);
+    private final AtomicInteger successCount = new AtomicInteger(0);
     private String mName;
     private int mHeight;
     private int mWidth;
+    private int mAlpha = 0xff << 24;
+    private int mRealParallelCount = PARALLEL_COUNT;
     private ColorStrategy mStrategy;
     private Callback mCallback;
     private int[] mColorArray;
-    private int mAlpha = 0xff << 24;
-    private final AtomicInteger resultCount = new AtomicInteger(0);
-    private final AtomicInteger successCount = new AtomicInteger(0);
-    private volatile Status mStatus = Status.PENDING;
     private int[] mProgress;
+    private volatile Status mStatus = Status.PENDING;
+
+    public void setRealParallelCount(int realParallelCount) {
+        mRealParallelCount = realParallelCount;
+    }
+
+    private ColorGenerator(Builder builder) {
+        setName(builder.name);
+        setCallback(builder.callback);
+        setWidthAndHeight(builder.width, builder.height);
+        setStrategy(builder.colorStrategy);
+    }
 
     public void setWidthAndHeight(int width, int height) {
         if (numberWrong(width) || numberWrong(height)) {
@@ -48,45 +59,6 @@ public class ColorGenerator {
         this.mName = name;
     }
 
-    private ColorGenerator(Builder builder) {
-        setName(builder.name);
-        setCallback(builder.callback);
-        setWidthAndHeight(builder.width, builder.height);
-        setStrategy(builder.colorStrategy);
-    }
-
-    public static class Builder {
-        private int    width   = 1024;
-        private int    height  = 1024;
-        private String name    = null;
-        private ColorStrategy colorStrategy;
-        private Callback callback;
-
-        public Builder(String name, Callback callback) {
-            this.name = name;
-            this.callback = callback;
-        }
-
-        public Builder setWidth(int width) {
-            this.width = width;
-            return this;
-        }
-
-        public Builder setHeight(int height) {
-            this.height = height;
-            return this;
-        }
-
-        public Builder setColorStrategy(ColorStrategy colorStrategy) {
-            this.colorStrategy = colorStrategy;
-            return this;
-        }
-
-        public ColorGenerator build() { // 构建，返回一个新对象
-            return new ColorGenerator(this);
-        }
-    }
-
     private boolean numberWrong(int number) {
         return (number <= 0 || number > 10000);
     }
@@ -94,7 +66,7 @@ public class ColorGenerator {
     /**
      * Create a bitmap using the color array created.
      *
-     * @return Null if mStatus is not Status.FINISHED, always call this method in CallBack.
+     * @return Null if mStatus is not Status.FINISHED, always invoke this method in CallBack.
      */
     public Bitmap createBitmap() {
         if (mStatus != Status.FINISHED) {
@@ -123,7 +95,7 @@ public class ColorGenerator {
         if (mCallback != null) {
             if (successCount.get() == mProgress.length) {
                 mCallback.onProgressUpdate(100);
-                mCallback.onColorsCreated();
+                mCallback.onColorsCreated(createBitmap());
             } else {
                 mCallback.onProgressUpdate(0);
                 mCallback.onError();
@@ -148,12 +120,12 @@ public class ColorGenerator {
         }
 
         if (inParallel) {
-            mProgress = new int[PARALLEL_COUNT];
+            mProgress = new int[mRealParallelCount];
             int begin;
             int end = 0;
-            for (int i = 1; i <= PARALLEL_COUNT; i++) {
+            for (int i = 1; i <= mRealParallelCount; i++) {
                 begin = end;
-                end = mHeight * i / PARALLEL_COUNT;
+                end = mHeight * i / mRealParallelCount;
                 // Log.d(TAG, "startCreateColor in parallel, begin=" + begin + " end=" + end);
                 new MyAsyncTask(i - 1, "AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
             }
@@ -208,10 +180,6 @@ public class ColorGenerator {
         return mColorArray;
     }
 
-    public int getAlpha() {
-        return mAlpha;
-    }
-
     /**
      * Set the alpha value for the Bitmap if you want
      */
@@ -223,22 +191,11 @@ public class ColorGenerator {
      * Indicates the current status of the holder.
      */
     public enum Status {
-        /**
-         * Indicates that the holder has not created colors yet.
-         */
-        PENDING,
-        /**
-         * Indicates that the holder is creating colors.
-         */
-        RUNNING,
-        /**
-         * Indicates that {@link ColorGenerator#createBitmap} has finished.
-         */
-        FINISHED,
+        PENDING, RUNNING, FINISHED,
     }
 
     /**
-     * Interface definition for a callback to be invoked when a view is clicked.
+     * 直接使用ColorGenerator，则使用此回调
      */
     public interface Callback {
         /**
@@ -255,7 +212,7 @@ public class ColorGenerator {
         /**
          * Called when colors has been created.
          */
-        void onColorsCreated();
+        void onColorsCreated(Bitmap bitmap);
 
         /**
          * Called when errors happened.
@@ -263,11 +220,51 @@ public class ColorGenerator {
         void onError();
     }
 
+    public static class Builder {
+        private int width = 1024;
+        private int height = 1024;
+        private String name = null;
+        private ColorStrategy colorStrategy;
+        private Callback callback;
+
+        public Builder(Callback callback) {
+            this.callback = callback;
+        }
+
+        public Builder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder setWidth(int width) {
+            this.width = width;
+            return this;
+        }
+
+        public Builder setHeight(int height) {
+            this.height = height;
+            return this;
+        }
+
+        public Builder setColorStrategy(ColorStrategy colorStrategy) {
+            this.colorStrategy = colorStrategy;
+            return this;
+        }
+
+        public ColorGenerator build() { // 构建，返回一个新对象
+            return new ColorGenerator(this);
+        }
+
+        public void start() { // 构建，返回一个新对象
+            build().startInParallel();
+        }
+    }
+
     /**
      * An implementation of {@link ColorGenerator.Callback} that has empty method bodies and
      * default return values.
      */
-    public static class SimpleCallback implements Callback {
+    public static abstract class SimpleCallback implements Callback {
         @Override
         public void onStart() {
         }
@@ -277,8 +274,7 @@ public class ColorGenerator {
         }
 
         @Override
-        public void onColorsCreated() {
-        }
+        public abstract void onColorsCreated(Bitmap bitmap);
 
         @Override
         public void onError() {

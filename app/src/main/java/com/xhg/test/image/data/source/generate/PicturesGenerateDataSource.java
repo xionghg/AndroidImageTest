@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.source.PicturesDataSource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class PicturesGenerateDataSource implements PicturesDataSource {
         } catch (InterruptedException e) {
 
         }
-        return (List)PICTURES_SERVICE_DATA.values();
+        return new ArrayList<>(PICTURES_SERVICE_DATA.values());
     }
 
     /**

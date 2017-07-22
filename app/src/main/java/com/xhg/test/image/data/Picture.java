@@ -18,27 +18,23 @@ public class Picture {
     private String mId;
 
     @Nullable
-    private final String mTitle;
-
-    @Nullable
-    private String mDescription;
+    private String mTitle;
 
     private ColorStrategy mStrategy;
 
     private Bitmap mBitmap;
 
-    public Picture(String title, String description) {
-        mTitle = title;
-        mDescription = description;
-    }
-
-    public Picture(String title, String description, String id) {
-        mTitle = title;
-        mDescription = description;
+    public Picture(String id, ColorStrategy colorStrategy) {
         mId = id;
+        mStrategy = colorStrategy;
     }
 
-    public void recyvle() {
+    public Picture(String id, String title ) {
+        mId = id;
+        mTitle = title;
+    }
+
+    public void recycle() {
         mBitmap = null;
     }
 
@@ -47,21 +43,32 @@ public class Picture {
         return mId;
     }
 
+    public void setId(@NonNull String id) {
+        mId = id;
+    }
+
     @Nullable
     public String getTitle() {
         return mTitle;
     }
 
-    @Nullable
-    public String getDescription() {
-        return mDescription;
+    public void setTitle(@Nullable String title) {
+        mTitle = title;
+    }
+
+    public ColorStrategy getStrategy() {
+        return mStrategy;
+    }
+
+    public void setStrategy(ColorStrategy strategy) {
+        mStrategy = strategy;
     }
 
     public Bitmap getBitmap() {
         return mBitmap;
     }
 
-    public ColorStrategy getStrategy() {
-        return mStrategy;
+    public void setBitmap(Bitmap bitmap) {
+        mBitmap = bitmap;
     }
 }

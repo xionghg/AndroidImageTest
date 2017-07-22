@@ -8,18 +8,19 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
@@ -38,16 +39,13 @@ import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
 
 public class PicturesFragment extends Fragment implements PicturesContract.View {
 
-    private PicturesContract.Presenter mPresenter;
-    private PicturesAdapter mAdapter;
+    private static final String TAG = "PicturesFragment";
 
-//    private View mNoPicturesView;
-//
-//    private ImageView mNoPictureIcon;
-//
-//    private TextView mNoPictureMainView;
-//
-//    private TextView mNoPictureAddView;
+    private PicturesContract.Presenter mPresenter;
+    private PicturesAdapter mRecyclerAdapter;
+
+    private Button mToButton;
+    private RecyclerView mRecyclerView;
 
     private RelativeLayout mPicturesView;
 
@@ -62,7 +60,19 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new PicturesAdapter(new ArrayList<Picture>(0), mItemListener);
+        mRecyclerAdapter = new PicturesAdapter(new ArrayList<Picture>(0), mItemListener);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.registerRepositoryCallBack(true);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mPresenter.registerRepositoryCallBack(false);
     }
 
     @Override
@@ -87,9 +97,6 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.pictures_frag, container, false);
 
-        // Set up Pictures view
-        RecyclerView recyclerView = (RecyclerView) root.findViewById(R.id.recycle_view);
-        recyclerView.setAdapter(mAdapter);
         mPicturesView = (RelativeLayout) root.findViewById(R.id.picturesRL);
 
         // Set up progress indicator
@@ -101,7 +108,24 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
         // swipeRefreshLayout.setScrollUpChild(listView);
+        mToButton = (Button) root.findViewById(R.id.to_button);
+        mToButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), PictureDetailActivity.class);
+                intent.putExtra("strategy_index", 4);
+                startActivity(intent);
+            }
+        });
 
+        mRecyclerView = (RecyclerView) root.findViewById(R.id.recycle_view);
+        LinearLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false);
+        //设置布局管理器
+        mRecyclerView.setLayoutManager(layoutManager);
+        //设置Adapter
+        mRecyclerView.setAdapter(mRecyclerAdapter);
+        //设置增加或删除条目的动画
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -135,7 +159,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
      */
     PicturesAdapter.OnItemClickListener mItemListener = new PicturesAdapter.OnItemClickListener() {
         @Override
-        public void onItemClick(Picture picture) {
+        public void onItemClick(int position, Picture picture) {
             mPresenter.openPictureDetails(picture);
         }
     };
@@ -164,7 +188,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
 
     @Override
     public void showPictures(List<Picture> Pictures) {
-        mAdapter.replaceData(Pictures);
+        mRecyclerAdapter.replaceData(Pictures);
         mPicturesView.setVisibility(View.VISIBLE);
     }
 
@@ -173,14 +197,10 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
         showMessage("No pictures");
     }
 
-//    private void showNoPicturesViews(String mainText, int iconRes, boolean showAddView) {
-//        mPicturesView.setVisibility(View.GONE);
-//        mNoPicturesView.setVisibility(View.VISIBLE);
-//
-//        mNoPictureMainView.setText(mainText);
-//        mNoPictureIcon.setImageDrawable(getResources().getDrawable(iconRes));
-//        mNoPictureAddView.setVisibility(showAddView ? View.VISIBLE : View.GONE);
-//    }
+    @Override
+    public void showPictureUpdate(int index, Picture picture) {
+        mRecyclerAdapter.changeItem(index, picture);
+    }
 
     @Override
     public void showPictureDetailsUi(String PictureId) {
@@ -199,4 +219,5 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     private void showMessage(String message) {
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
+
 }

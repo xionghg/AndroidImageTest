@@ -22,6 +22,8 @@ public interface PicturesContract {
 
         void showPictures(List<Picture> pictures);
 
+        void showPictureUpdate(int index, Picture picture);
+
         void showEmptyPictures(int size);
 
         void showPictureDetailsUi(String pictureId);
@@ -38,5 +40,7 @@ public interface PicturesContract {
         void loadPictures(boolean forceUpdate);
 
         void openPictureDetails(@NonNull Picture requestedPicture);
+
+        void registerRepositoryCallBack(boolean isRegister);
     }
 }

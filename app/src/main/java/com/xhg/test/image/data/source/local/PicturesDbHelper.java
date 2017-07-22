@@ -19,8 +19,7 @@ public class PicturesDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + PictureEntry.TABLE_NAME + " (" +
                     PictureEntry._ID + TEXT_TYPE + " PRIMARY KEY," +
                     PictureEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
-                    PictureEntry.COLUMN_NAME_TITLE + TEXT_TYPE + COMMA_SEP +
-                    PictureEntry.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + COMMA_SEP +
+                    PictureEntry.COLUMN_NAME_TITLE + TEXT_TYPE +
             " )";
 
     public PicturesDbHelper(Context context) {
