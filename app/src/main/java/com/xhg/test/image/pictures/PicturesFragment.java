@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.picturedetail.PictureDetailActivity;
+import com.xhg.test.image.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         mRecyclerAdapter = new PicturesAdapter(new ArrayList<Picture>(0), mItemListener);
     }
 
@@ -78,7 +80,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.start();
+        //mPresenter.start();
     }
 
     @Override
@@ -132,18 +134,22 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
                 mPresenter.loadPictures(false);
             }
         });
-        setHasOptionsMenu(true);
+
         return root;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.e(TAG, "onOptionsItemSelected: ");
         switch (item.getItemId()) {
             case R.id.menu_help:
                 showMessage("coming soon");
                 break;
-            case R.id.menu_refresh:
-                mPresenter.loadPictures(true);
+            case R.id.menu_settings:
+                //mPresenter.loadPictures(true);
+                Log.e(TAG, "onOptionsItemSelected: setting");
+                Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(intent);
                 break;
         }
         return true;
@@ -217,7 +223,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     }
 
     private void showMessage(String message) {
-        Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(getView(), message, Snackbar.LENGTH_SHORT).show();
     }
 
 }

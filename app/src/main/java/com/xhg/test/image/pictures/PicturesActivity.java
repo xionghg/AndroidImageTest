@@ -39,11 +39,12 @@ public class PicturesActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        //设置图标
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_32dp);
-        //显示导航按钮
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
+        if (actionBar != null) {
+            //设置图标
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_32dp);
+            //显示导航按钮
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         PicturesFragment picturesFragment =
                 (PicturesFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
@@ -71,6 +72,6 @@ public class PicturesActivity extends AppCompatActivity {
             default:
                 break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 }
