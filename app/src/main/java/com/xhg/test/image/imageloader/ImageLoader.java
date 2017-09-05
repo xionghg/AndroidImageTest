@@ -91,7 +91,7 @@ public class ImageLoader {
                 return bitmap.getRowBytes() * bitmap.getHeight() / 1024;
             }
         };
-        File diskCacheDir = getDiskCacheDir(mContext, "bitmap");
+        File diskCacheDir = null;//getDiskCacheDir(mContext, "bitmap");
         if (!diskCacheDir.exists()) {
             diskCacheDir.mkdirs();
         }
@@ -190,6 +190,14 @@ public class ImageLoader {
             this.uri = s;
             this.bitmap = b;
         }
+    }
+
+    private String hashKeyFromUri(String url) {
+        return null;
+    }
+
+    private int getUsableSpace(File file) {
+        return 0;
     }
 
 

@@ -62,7 +62,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mRecyclerAdapter = new PicturesAdapter(new ArrayList<Picture>(0), mItemListener);
+        mRecyclerAdapter = new PicturesAdapter(mItemListener);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     @Override
     public void onResume() {
         super.onResume();
-        //mPresenter.start();
+        mPresenter.start();
     }
 
     @Override
@@ -146,8 +146,6 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
                 showMessage("coming soon");
                 break;
             case R.id.menu_settings:
-                //mPresenter.loadPictures(true);
-                Log.e(TAG, "onOptionsItemSelected: setting");
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(intent);
                 break;
@@ -165,7 +163,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
      */
     PicturesAdapter.OnItemClickListener mItemListener = new PicturesAdapter.OnItemClickListener() {
         @Override
-        public void onItemClick(int position, Picture picture) {
+        public void onItemClick(Picture picture) {
             mPresenter.openPictureDetails(picture);
         }
     };
@@ -188,12 +186,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     }
 
     @Override
-    public void showEmptyPictures(int size) {
-
-    }
-
-    @Override
-    public void showPictures(List<Picture> Pictures) {
+    public void showEmptyPictures(List<Picture> Pictures) {
         mRecyclerAdapter.replaceData(Pictures);
         mPicturesView.setVisibility(View.VISIBLE);
     }
@@ -209,7 +202,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     }
 
     @Override
-    public void showPictureDetailsUi(String PictureId) {
+    public void showPictureDetailsUi(int PictureId) {
         // in it's own Activity, since it makes more sense that way and it gives us the flexibility
         // to show some Intent stubbing.
         Intent intent = new Intent(getContext(), PictureDetailActivity.class);

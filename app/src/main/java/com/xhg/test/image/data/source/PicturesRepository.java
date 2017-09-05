@@ -26,7 +26,7 @@ public class PicturesRepository implements PicturesDataSource {
     private static PicturesRepository INSTANCE;
     private final PicturesDataSource mPicturesGenerateDataSource;
     private final PicturesDataSource mPicturesLocalDataSource;
-    private Map<String, Picture> mCachedPictures;
+    private Map<Integer, Picture> mCachedPictures;
     private boolean mCacheIsDirty;
 
     private List<PicturesRepositoryObserver> mObservers = new ArrayList<>();
@@ -184,7 +184,7 @@ public class PicturesRepository implements PicturesDataSource {
     }
 
     @Override
-    public void deletePicture(@NonNull String PictureId) {
+    public void deletePicture(@NonNull int PictureId) {
         mPicturesGenerateDataSource.deletePicture(checkNotNull(PictureId));
         mPicturesLocalDataSource.deletePicture(checkNotNull(PictureId));
         mCachedPictures.remove(PictureId);
@@ -210,7 +210,7 @@ public class PicturesRepository implements PicturesDataSource {
         }
     }
 
-    public void addLoadCallback (LoadCallback callback) {
+    public void addLoadCallback(LoadCallback callback) {
         if (!mCallbacks.contains(callback)) {
             mCallbacks.add(callback);
         }
@@ -238,8 +238,8 @@ public class PicturesRepository implements PicturesDataSource {
         void onPicturesChanged();
     }
 
-    public interface LoadCallback<T> {
-        void onLoadOneFinished(T data);
-        void onRefreshAllFinished(List<T> datas);
+    public interface LoadCallback {
+        void onLoadOneFinished(Picture data);
+        void onRefreshAllFinished(List<Picture> datas);
     }
 }

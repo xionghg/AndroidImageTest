@@ -2,6 +2,7 @@ package com.xhg.test.image.pictures;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.StrategyFactory;
@@ -21,7 +22,7 @@ import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
  */
 
 public class PicturesPresenter implements PicturesContract.Presenter,
-        PicturesRepository.LoadCallback<Picture> {
+        PicturesRepository.LoadCallback {
     private static final String TAG = "PicturesPresenter";
 
     private final PicturesRepository mPicturesRepository;
@@ -46,23 +47,31 @@ public class PicturesPresenter implements PicturesContract.Presenter,
         ColorStrategy[] colorStrategies = StrategyFactory.getInstance().getStrategies();
         int n = 0;
         for (ColorStrategy strategy : colorStrategies) {
-            Picture pic = new Picture("Picture" + (++n), strategy);
+            Picture pic = new Picture(n++, strategy);
             mCurrentPictures.add(pic);
         }
-        mPicturesView.showPictures(mCurrentPictures);
+        mPicturesView.showEmptyPictures(mCurrentPictures);
+
+//        startGenerateColor();
+    }
+
+    private void startGenerateColor() {
         for (int i = 0; i < mCurrentPictures.size(); i++) {
             final int index = i;
-            new ColorGenerator.Builder(new ColorGenerator.SimpleCallback() {
+            ColorGenerator.Callback callback = new ColorGenerator.SimpleCallback() {
                 @Override
                 public void onColorsCreated(Bitmap bitmap) {
                     mCurrentPictures.get(index).setBitmap(bitmap);
                     mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
                 }
-            })
+            };
+            Log.e(TAG, "start generator"+i);
+            new ColorGenerator.Builder(callback)
                     .setWidth(512)
                     .setHeight(512)
                     .setColorStrategy(mCurrentPictures.get(index).getStrategy())
-                    .start();
+                    .build()
+                    .startInParallel();
         }
     }
 
@@ -105,7 +114,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
             processEmptyPictures();
         } else {
             // Show the list of Pictures
-            mPicturesView.showPictures(Pictures);
+            mPicturesView.showEmptyPictures(Pictures);
         }
     }
 

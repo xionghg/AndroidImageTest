@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.source.PicturesDataSource;
+import com.xhg.test.image.strategies.ColorStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class PicturesGenerateDataSource implements PicturesDataSource {
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
 
-    private static Map<String, Picture> PICTURES_SERVICE_DATA;
+    private static Map<Integer, Picture> PICTURES_SERVICE_DATA;
 
     public static PicturesGenerateDataSource getInstance() {
         if (INSTANCE == null) {
@@ -30,8 +31,8 @@ public class PicturesGenerateDataSource implements PicturesDataSource {
     // Prevent direct instantiation.
     private PicturesGenerateDataSource() {}
 
-    private static void addPicture(String title, String description) {
-        Picture newPicture = new Picture(title, description);
+    private static void addPicture(int id, ColorStrategy strategy) {
+        Picture newPicture = new Picture(id, strategy);
         PICTURES_SERVICE_DATA.put(newPicture.getId(), newPicture);
     }
 
@@ -81,7 +82,7 @@ public class PicturesGenerateDataSource implements PicturesDataSource {
     }
 
     @Override
-    public void deletePicture(@NonNull String PictureId) {
+    public void deletePicture(@NonNull int PictureId) {
         PICTURES_SERVICE_DATA.remove(PictureId);
     }
 }

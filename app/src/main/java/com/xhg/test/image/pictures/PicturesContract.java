@@ -20,13 +20,11 @@ public interface PicturesContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showPictures(List<Picture> pictures);
+        void showEmptyPictures(List<Picture> pictures);
 
         void showPictureUpdate(int index, Picture picture);
 
-        void showEmptyPictures(int size);
-
-        void showPictureDetailsUi(String pictureId);
+        void showPictureDetailsUi(int pictureId);
 
         void showLoadingPicturesError();
 

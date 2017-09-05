@@ -15,23 +15,19 @@ import com.xhg.test.image.strategies.ColorStrategy;
 public class Picture {
 
     @NonNull
-    private String mId;
+    private final int mId;
 
     @Nullable
-    private String mTitle;
+    private final String mTitle;
 
-    private ColorStrategy mStrategy;
+    private final ColorStrategy mStrategy;
 
     private Bitmap mBitmap;
 
-    public Picture(String id, ColorStrategy colorStrategy) {
+    public Picture(int id, ColorStrategy colorStrategy) {
         mId = id;
+        mTitle = "Picture" + id;
         mStrategy = colorStrategy;
-    }
-
-    public Picture(String id, String title ) {
-        mId = id;
-        mTitle = title;
     }
 
     public void recycle() {
@@ -39,12 +35,8 @@ public class Picture {
     }
 
     @NonNull
-    public String getId() {
+    public int getId() {
         return mId;
-    }
-
-    public void setId(@NonNull String id) {
-        mId = id;
     }
 
     @Nullable
@@ -52,16 +44,8 @@ public class Picture {
         return mTitle;
     }
 
-    public void setTitle(@Nullable String title) {
-        mTitle = title;
-    }
-
     public ColorStrategy getStrategy() {
         return mStrategy;
-    }
-
-    public void setStrategy(ColorStrategy strategy) {
-        mStrategy = strategy;
     }
 
     public Bitmap getBitmap() {

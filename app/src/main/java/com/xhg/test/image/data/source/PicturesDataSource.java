@@ -36,5 +36,5 @@ public interface PicturesDataSource {
 
     void deleteAllPictures();
 
-    void deletePicture(@NonNull String PictureId);
+    void deletePicture(@NonNull int PictureId);
 }

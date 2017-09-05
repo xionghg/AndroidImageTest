@@ -3,22 +3,13 @@ package com.xhg.test.image.pictures;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
-import com.xhg.test.image.data.source.PicturesLoader;
-import com.xhg.test.image.data.source.PicturesRepository;
 import com.xhg.test.image.R;
-import com.xhg.test.image.data.StrategyFactory;
-import com.xhg.test.image.strategies.ColorStrategy;
-import com.xhg.test.image.strategies.GeneratorManger;
+import com.xhg.test.image.data.source.PicturesRepository;
 import com.xhg.test.image.utils.ActivityUtils;
-
-import java.util.List;
-import java.util.concurrent.Executors;
 
 /**
  * @author xionghg
@@ -47,20 +38,17 @@ public class PicturesActivity extends AppCompatActivity {
         }
 
         PicturesFragment picturesFragment =
-                (PicturesFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
+                (PicturesFragment) getSupportFragmentManager().findFragmentById(R.id.main_content_frame);
         if (picturesFragment == null) {
             picturesFragment = PicturesFragment.newInstance();
             ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), picturesFragment, R.id.content_frame);
+                    getSupportFragmentManager(), picturesFragment, R.id.main_content_frame);
         }
 
-        // Create the presenter
+        // Create the repository
         PicturesRepository repository = PicturesRepository.providePicturesRepository(getApplicationContext());
 
-        mPicturesPresenter = new PicturesPresenter(
-                repository,
-                picturesFragment
-        );
+        mPicturesPresenter = new PicturesPresenter(repository, picturesFragment);
     }
 
     @Override

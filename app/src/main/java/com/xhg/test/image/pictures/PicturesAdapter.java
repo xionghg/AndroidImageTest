@@ -10,7 +10,6 @@ import android.widget.ImageView;
 
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
-import com.xhg.test.image.strategies.ColorGenerator;
 
 import java.util.List;
 
@@ -28,8 +27,7 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
 
     private OnItemClickListener mOnItemClickListener;
 
-    public PicturesAdapter(List<Picture> pictures, OnItemClickListener onItemClickListener) {
-        this.mPictures = pictures;
+    public PicturesAdapter(OnItemClickListener onItemClickListener) {
         this.mOnItemClickListener = onItemClickListener;
     }
 
@@ -65,10 +63,6 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
         notifyItemRemoved(position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.mOnItemClickListener = listener;
-    }
-
     //填充onCreateViewHolder方法返回的holder中的控件
     @Override
     public void onBindViewHolder(final PicturesViewHolder holder,
@@ -86,12 +80,14 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
         if (bitmap != null) {
             Log.e(TAG, "onBindViewHolder: bitmap not null");
             holder.imageView.setImageBitmap(bitmap);
+        } else {
+            holder.imageView.setImageResource(R.drawable.empty_image_150dp);
         }
         holder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(position, mPictures.get(position));
+                    mOnItemClickListener.onItemClick(mPictures.get(position));
                 }
             }
         });
@@ -105,7 +101,7 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int position, Picture picture);
+        void onItemClick(Picture picture);
     }
 
     static class PicturesViewHolder extends RecyclerView.ViewHolder {
