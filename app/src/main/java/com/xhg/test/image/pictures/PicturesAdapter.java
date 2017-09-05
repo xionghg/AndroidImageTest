@@ -53,9 +53,10 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
     }
 
     public void changeItem(int position, Picture picture) {
+        Log.d(TAG, "changeItem: position=" + position);
         mPictures.set(position, picture);
-        //notifyItemChanged(position);
-        notifyDataSetChanged();
+        notifyItemChanged(position);
+//        notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
@@ -75,7 +76,7 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
 //                holder.imageView.setImageBitmap(colorHolder.createBitmap());
 //            }
 //        }).startInParallel();
-        Log.e(TAG, "onBindViewHolder: ");
+        Log.e(TAG, "onBindViewHolder: position=" + position);
         Bitmap bitmap = mPictures.get(position).getBitmap();
         if (bitmap != null) {
             Log.e(TAG, "onBindViewHolder: bitmap not null");

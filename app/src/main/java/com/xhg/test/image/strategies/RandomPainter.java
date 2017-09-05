@@ -1,5 +1,8 @@
 package com.xhg.test.image.strategies;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author xionghg
  * @email xiong9394@gmail.com
@@ -17,14 +20,45 @@ public class RandomPainter extends CombinedRGBColorStrategy {
     }
 
     private char getColor(char[][] c, int i, int j) {
+//        if (c[i][j] == 0) {
+//            if (random(999) == 0) {
+//                return c[i][j] = random(256);
+//            } else {
+//                return c[i][j] = getColor(c, (i + random(2)) % WIDTH, (j + random(2)) % HEIGHT);
+//            }
+//        } else {
+//            return c[i][j];
+//        }
+        // code above can easily lead to a stack overflow.
         if (c[i][j] == 0) {
-            if (random(999) == 0) {
-                return c[i][j] = random(256);
-            } else {
-                return c[i][j] = getColor(c, (i + random(2)) % WIDTH, (j + random(2)) % HEIGHT);
+            List<Point> cache = new LinkedList<>();
+            int ii = i;
+            int ij = j;
+            char result = 0;
+            while (random(999) != 0 && (result = c[ii][ij]) == 0) {
+                cache.add(new Point(ii, ij));
+                ii = (ii + random(2)) % WIDTH;
+                ij = (ij + random(2)) % HEIGHT;
             }
-        } else {
-            return c[i][j];
+            cache.add(new Point(ii, ij));
+
+            if (result == 0) {
+                result = random(256);
+            }
+            for (Point p : cache) {
+                c[p.x][p.y] = result;
+            }
+        }
+        return c[i][j];
+    }
+
+    private static class Point {
+        int x;
+        int y;
+
+        Point(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
     }
 

@@ -34,10 +34,10 @@ public class StrategyFactory {
     }
 
     private void init() {
-        mStrategies = new ColorStrategy[]{new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()
-                , new TableCloths(), new RandomPainter(), new Mandelbrot3()
-                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()
-                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot3()};
+        mStrategies = new ColorStrategy[]{new RandomPainter(), new Mandelbrot2(), new Mandelbrot3()
+                , new TableCloths(), new Mandelbrot1(), new Mandelbrot1()
+                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot2()
+                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot1()};
     }
 
     public ColorStrategy getStrategy(int index) {

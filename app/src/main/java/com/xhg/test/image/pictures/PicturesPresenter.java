@@ -52,11 +52,11 @@ public class PicturesPresenter implements PicturesContract.Presenter,
         }
         mPicturesView.showEmptyPictures(mCurrentPictures);
 
-//        startGenerateColor();
+        startGenerateColor();
     }
 
     private void startGenerateColor() {
-        for (int i = 0; i < mCurrentPictures.size(); i++) {
+        for (int i = 0; i < 2/*mCurrentPictures.size()*/; i++) {
             final int index = i;
             ColorGenerator.Callback callback = new ColorGenerator.SimpleCallback() {
                 @Override
