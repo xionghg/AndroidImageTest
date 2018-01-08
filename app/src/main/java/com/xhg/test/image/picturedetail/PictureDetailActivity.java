@@ -3,11 +3,11 @@ package com.xhg.test.image.picturedetail;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -17,9 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.xhg.test.image.strategies.ColorGenerator;
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.StrategyFactory;
+import com.xhg.test.image.strategies.ColorGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.utils.FileUtils;
 
@@ -27,7 +27,7 @@ import java.util.Locale;
 
 public class PictureDetailActivity extends AppCompatActivity {
     private static final String TAG = "TestBitmap-BigImage";
-    public static final String  EXTRA_PICTURE_ID = "extra_picture_id";
+    public static final String EXTRA_PICTURE_ID = "extra_picture_id";
     private ColorGenerator mHolder;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
@@ -69,6 +69,7 @@ public class PictureDetailActivity extends AppCompatActivity {
             @Override
             public void onColorsCreated(Bitmap bitmap) {
                 Log.d(TAG, "ColorHolder: set color end");
+                mBitmap = bitmap;
                 mImageView.setImageBitmap(bitmap);
                 mStartButton.setEnabled(true);
                 mSaveButton.setEnabled(true);

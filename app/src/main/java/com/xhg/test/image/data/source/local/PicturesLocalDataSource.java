@@ -2,18 +2,18 @@ package com.xhg.test.image.data.source.local;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.source.PicturesDataSource;
 
 import java.util.List;
-
-import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+import java.util.Objects;
 
 
 /**
  * Concrete implementation of a data source as a db.
- * <P>
+ * <p>
  * Note: this is a singleton and we are opening the database once and not closing it. The framework
  * cleans up the resources when the application closes so we don't need to close the db.
  */
@@ -25,7 +25,7 @@ public class PicturesLocalDataSource implements PicturesDataSource {
 
     // Prevent direct instantiation.
     private PicturesLocalDataSource(@NonNull Context context) {
-        checkNotNull(context);
+        Objects.requireNonNull(context);
         mDbHelper = new PicturesDbHelper(context);
     }
 
@@ -39,6 +39,7 @@ public class PicturesLocalDataSource implements PicturesDataSource {
     @Override
     public List<Picture> getPictures() {
         // eg: get pictures form sd card
+        ViewPager d;
         return null;
     }
 

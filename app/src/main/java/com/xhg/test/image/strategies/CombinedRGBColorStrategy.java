@@ -7,7 +7,6 @@ package com.xhg.test.image.strategies;
  * Subclasses can only override the getRGB() methods to return a combine RGB value.
  *
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-11.
  */
 

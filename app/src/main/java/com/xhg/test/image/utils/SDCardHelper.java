@@ -72,7 +72,7 @@ public class SDCardHelper {
      * 往SD卡的公有目录下保存文件
      *
      * @param data
-     * @param type      In {@link android.os.Environment#DIRECTORY_MUSIC} etc
+     * @param type     In {@link android.os.Environment#DIRECTORY_MUSIC} etc
      * @param fileName
      * @return
      */

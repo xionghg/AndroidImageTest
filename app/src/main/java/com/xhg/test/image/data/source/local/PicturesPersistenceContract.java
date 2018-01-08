@@ -9,7 +9,8 @@ public final class PicturesPersistenceContract {
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
-    private PicturesPersistenceContract() {}
+    private PicturesPersistenceContract() {
+    }
 
     /* Inner class that defines the table contents */
     public static abstract class PictureEntry implements BaseColumns {

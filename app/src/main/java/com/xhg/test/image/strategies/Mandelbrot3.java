@@ -4,7 +4,6 @@ package com.xhg.test.image.strategies;
  * 分形图形3
  *
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-10.
  */
 

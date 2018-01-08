@@ -34,7 +34,7 @@ public class ImageResizer {
     }
 
     public Bitmap decodeSampledBitmapFromFileDescriptor(FileDescriptor fd,
-                                                       int reqWidth, int reqHeight) {
+                                                        int reqWidth, int reqHeight) {
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -56,7 +56,7 @@ public class ImageResizer {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
-        Log.d(TAG, "origin, w=" + width +", h=" + height);
+        Log.d(TAG, "origin, w=" + width + ", h=" + height);
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
@@ -66,7 +66,7 @@ public class ImageResizer {
             // Calculate the largest inSampleSize value that is a power of 2 and keeps
             // both height and width larger than the requested height and width.
             while ((halfHeight / inSampleSize) >= reqHeight
-                && (halfWidth / inSampleSize) >= reqWidth) {
+                    && (halfWidth / inSampleSize) >= reqWidth) {
                 inSampleSize *= 2;
             }
         }

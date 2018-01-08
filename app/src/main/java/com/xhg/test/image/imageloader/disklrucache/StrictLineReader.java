@@ -62,9 +62,9 @@ class StrictLineReader implements Closeable {
     /**
      * Constructs a new {@code LineReader} with the specified charset and the default capacity.
      *
-     * @param in the {@code InputStream} to read data from.
+     * @param in      the {@code InputStream} to read data from.
      * @param charset the charset used to decode data. Only US-ASCII, UTF-8 and ISO-8859-1 are
-     * supported.
+     *                supported.
      * @throws NullPointerException     if {@code in} or {@code charset} is null.
      * @throws IllegalArgumentException if the specified charset is not supported.
      */
@@ -75,10 +75,10 @@ class StrictLineReader implements Closeable {
     /**
      * Constructs a new {@code LineReader} with the specified capacity and charset.
      *
-     * @param in the {@code InputStream} to read data from.
+     * @param in       the {@code InputStream} to read data from.
      * @param capacity the capacity of the buffer.
-     * @param charset the charset used to decode data. Only US-ASCII, UTF-8 and ISO-8859-1 are
-     * supported.
+     * @param charset  the charset used to decode data. Only US-ASCII, UTF-8 and ISO-8859-1 are
+     *                 supported.
      * @throws NullPointerException     if {@code in} or {@code charset} is null.
      * @throws IllegalArgumentException if {@code capacity} is negative or zero
      *                                  or the specified charset is not supported.

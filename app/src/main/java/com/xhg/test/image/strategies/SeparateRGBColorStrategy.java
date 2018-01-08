@@ -3,15 +3,14 @@ package com.xhg.test.image.strategies;
 /**
  * Abstract class as a color strategy to be invoked.
  * Return RGB values for a specified pixel.
- *
+ * <p>
  * Subclasses can only override three separate getX() methods.
  *
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-08.
  */
 
-public abstract class SeparateRGBColorStrategy implements ColorStrategy{
+public abstract class SeparateRGBColorStrategy implements ColorStrategy {
 
     public abstract int getRed(int x, int y);
 

@@ -12,8 +12,7 @@ import com.xhg.test.image.strategies.ColorStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+import java.util.Objects;
 
 
 /**
@@ -35,8 +34,8 @@ public class PicturesPresenter implements PicturesContract.Presenter,
 
     public PicturesPresenter(@NonNull PicturesRepository PicturesRepository,
                              @NonNull PicturesContract.View PicturesView) {
-        mPicturesRepository = checkNotNull(PicturesRepository, "PicturesRepository cannot be null");
-        mPicturesView = checkNotNull(PicturesView, "PicturesView cannot be null!");
+        mPicturesRepository = Objects.requireNonNull(PicturesRepository, "PicturesRepository cannot be null");
+        mPicturesView = Objects.requireNonNull(PicturesView, "PicturesView cannot be null!");
         mPicturesView.setPresenter(this);
     }
 
@@ -65,7 +64,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
                     mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
                 }
             };
-            Log.e(TAG, "start generator"+i);
+            Log.e(TAG, "start generator" + i);
             new ColorGenerator.Builder(callback)
                     .setWidth(512)
                     .setHeight(512)
@@ -124,7 +123,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
 
     @Override
     public void openPictureDetails(@NonNull Picture requestedPicture) {
-        checkNotNull(requestedPicture, "requestedPicture cannot be null!");
+        Objects.requireNonNull(requestedPicture, "requestedPicture cannot be null!");
         mPicturesView.showPictureDetailsUi(requestedPicture.getId());
     }
 

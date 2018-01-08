@@ -13,7 +13,6 @@ import com.xhg.test.image.utils.ActivityUtils;
 
 /**
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-04.
  */
 

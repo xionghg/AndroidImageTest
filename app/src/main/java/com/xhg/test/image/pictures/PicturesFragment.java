@@ -27,10 +27,8 @@ import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.picturedetail.PictureDetailActivity;
 import com.xhg.test.image.settings.SettingsActivity;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+import java.util.Objects;
 
 
 /**
@@ -85,7 +83,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
 
     @Override
     public void setPresenter(@NonNull PicturesContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+        mPresenter = Objects.requireNonNull(presenter);
     }
 
     @Override

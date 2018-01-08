@@ -1,17 +1,14 @@
 package com.xhg.test.image.strategies;
 
-import android.os.Bundle;
-
 import com.xhg.test.image.data.Picture;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 /**
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-20.
  */
 
@@ -44,12 +41,12 @@ public class GeneratorManger {
         int setGeneratorSize();
 
         ColorGenerator onCreateGenerator(int index);
-        
+
         void onGenerateFinished(ColorGenerator generator, Picture data);
     }
 
     public void initGenerator(GeneratorCallback callback) {
-        mGeneratorCallback = checkNotNull(callback);
+        mGeneratorCallback = requireNonNull(callback);
         int size = mGeneratorCallback.setGeneratorSize();
         for (int i = 0; i < size; i++) {
             ColorGenerator generator = mGeneratorCallback.onCreateGenerator(i);
@@ -67,7 +64,7 @@ public class GeneratorManger {
     }
 
     public boolean isWorking() {
-        return mWorkingGenerators!= null && mWorkingGenerators.size() > 0;
+        return mWorkingGenerators != null && mWorkingGenerators.size() > 0;
     }
 
 }

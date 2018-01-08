@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.xhg.test.image.utils.CheckUtils.checkNotNull;
-
+import java.util.Objects;
 
 /**
  * @author xionghg
@@ -40,7 +38,7 @@ public class PicturesRepository implements PicturesDataSource {
 
     // put here temp
     public static PicturesRepository providePicturesRepository(Context context) {
-        checkNotNull(context);
+        Objects.requireNonNull(context);
         return PicturesRepository.getInstance(PicturesGenerateDataSource.getInstance(),
                 PicturesLocalDataSource.getInstance(context));
     }
@@ -121,7 +119,7 @@ public class PicturesRepository implements PicturesDataSource {
 
     @Override
     public void savePicture(@NonNull Picture picture) {
-        checkNotNull(picture);
+        Objects.requireNonNull(picture);
         mPicturesGenerateDataSource.savePicture(picture);
         mPicturesLocalDataSource.savePicture(picture);
 
@@ -137,7 +135,7 @@ public class PicturesRepository implements PicturesDataSource {
     }
 
     public Picture getPicture(@NonNull final String pictureId) {
-        checkNotNull(pictureId);
+        Objects.requireNonNull(pictureId);
 
         Picture cachedPicture = getPictureWithId(pictureId);
 
@@ -157,7 +155,7 @@ public class PicturesRepository implements PicturesDataSource {
 
     @Nullable
     private Picture getPictureWithId(@NonNull String id) {
-        checkNotNull(id);
+        Objects.requireNonNull(id);
         if (mCachedPictures == null || mCachedPictures.isEmpty()) {
             return null;
         } else {
@@ -185,8 +183,8 @@ public class PicturesRepository implements PicturesDataSource {
 
     @Override
     public void deletePicture(@NonNull int PictureId) {
-        mPicturesGenerateDataSource.deletePicture(checkNotNull(PictureId));
-        mPicturesLocalDataSource.deletePicture(checkNotNull(PictureId));
+        mPicturesGenerateDataSource.deletePicture(Objects.requireNonNull(PictureId));
+        mPicturesLocalDataSource.deletePicture(Objects.requireNonNull(PictureId));
         mCachedPictures.remove(PictureId);
         // Update the UI
         notifyContentObserver();
@@ -240,6 +238,7 @@ public class PicturesRepository implements PicturesDataSource {
 
     public interface LoadCallback {
         void onLoadOneFinished(Picture data);
+
         void onRefreshAllFinished(List<Picture> datas);
     }
 }

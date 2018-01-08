@@ -58,10 +58,12 @@ public class FileUtils {
         String cachePath;
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
                 || !Environment.isExternalStorageRemovable()) {
-            //外部存储可用, or getExternalFilesDir
+            // 外部存储可用, or getExternalFilesDir
+            // /storage/sdcard0/Android/data/pkgName/cache
             cachePath = context.getExternalCacheDir().getPath();
         } else {
-            //外部存储不可用
+            // 外部存储不可用
+            // /data/data/pkgName/cache
             cachePath = context.getCacheDir().getPath();
         }
         return cachePath;

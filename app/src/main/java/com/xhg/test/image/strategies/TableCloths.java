@@ -2,7 +2,6 @@ package com.xhg.test.image.strategies;
 
 /**
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-16.
  */
 
@@ -23,6 +22,6 @@ public class TableCloths extends CombinedRGBColorStrategy {
         double i = (y + Math.sin((x * x + (y - 700) * (y - 700) * 5) / 100. / DIM) * 35) * h;
         double j = (x + DIM) * h + i;
         double k = (DIM * 2 - x) * h + i;
-        return new double[]{j ,k};
+        return new double[]{j, k};
     }
 }

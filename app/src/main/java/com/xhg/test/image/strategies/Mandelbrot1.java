@@ -4,7 +4,6 @@ package com.xhg.test.image.strategies;
  * 分形图形1
  *
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-04.
  */
 
@@ -29,6 +28,6 @@ public class Mandelbrot1 extends CombinedRGBColorStrategy {
         int r = (int) (Math.log(k) * 47) % 256 << 16;
         int g = r >> 8;
         int b = (128 - (int) (Math.log(k) * 23)) % 256;
-        return r|g|b;
+        return r | g | b;
     }
 }

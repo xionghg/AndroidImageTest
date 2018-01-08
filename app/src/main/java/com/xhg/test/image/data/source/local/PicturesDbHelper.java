@@ -3,7 +3,9 @@ package com.xhg.test.image.data.source.local;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.xhg.test.image.data.source.local.PicturesPersistenceContract.PictureEntry;
+
 public class PicturesDbHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
 
@@ -20,7 +22,7 @@ public class PicturesDbHelper extends SQLiteOpenHelper {
                     PictureEntry._ID + TEXT_TYPE + " PRIMARY KEY," +
                     PictureEntry.COLUMN_NAME_ENTRY_ID + TEXT_TYPE + COMMA_SEP +
                     PictureEntry.COLUMN_NAME_TITLE + TEXT_TYPE +
-            " )";
+                    " )";
 
     public PicturesDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

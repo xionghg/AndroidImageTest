@@ -17,6 +17,7 @@ import java.util.List;
 public class PicturesLoader extends Loader<List<Picture>> {
 
     private PicturesRepository mRepository;
+
     public PicturesLoader(Context context, PicturesRepository repository) {
         super(context);
         mRepository = repository;

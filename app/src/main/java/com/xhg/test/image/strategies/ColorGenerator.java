@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-04.
  */
 

@@ -29,7 +29,8 @@ public class PicturesGenerateDataSource implements PicturesDataSource {
     }
 
     // Prevent direct instantiation.
-    private PicturesGenerateDataSource() {}
+    private PicturesGenerateDataSource() {
+    }
 
     private static void addPicture(int id, ColorStrategy strategy) {
         Picture newPicture = new Picture(id, strategy);

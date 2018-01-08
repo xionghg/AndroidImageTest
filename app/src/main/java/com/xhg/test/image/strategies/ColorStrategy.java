@@ -3,17 +3,16 @@ package com.xhg.test.image.strategies;
 /**
  * Super class as a color strategy to be invoked.
  * Return RGB values for a specified pixel.
- *
+ * <p>
  * At the beginning of this project, I simply wanted to define this super class as an interface,
  * but when the project got bigger, some problems had been exposed, like multithreading and
  * default-method missing. So I decided to define this as an abstract class.
- *
+ * <p>
  * After that, I also found that calculation for R,G,b values in some strategy are separate but
  * some other's are not, So finally I made this interface and defined two different abstract classes
  * to implements it.
  *
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-08.
  */
 

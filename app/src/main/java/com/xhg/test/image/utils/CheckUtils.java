@@ -6,7 +6,6 @@ import java.util.Collection;
 
 /**
  * @author xionghg
- * @email xiong9394@gmail.com
  * @created 2017-07-22.
  */
 
@@ -16,16 +15,17 @@ public class CheckUtils {
         // Utility class.
     }
 
-    public static <T> T checkNotNull(T arg) {
-        return checkNotNull(arg, "Argument must not be null");
-    }
+//    public static <T> T requireNonNull(T arg) {
+//        Objects.requireNonNull(arg);
+//        return requireNonNull(arg, "Argument must not be null");
+//    }
 
-    public static <T> T checkNotNull(T arg, String message) {
-        if (arg == null) {
-            throw new NullPointerException(message);
-        }
-        return arg;
-    }
+//    public static <T> T requireNonNull(T arg, String message) {
+//        if (arg == null) {
+//            throw new NullPointerException(message);
+//        }
+//        return arg;
+//    }
 
     public static String checkNotEmpty(String string) {
         if (TextUtils.isEmpty(string)) {
