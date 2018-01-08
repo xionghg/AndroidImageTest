@@ -15,19 +15,18 @@ ColorHolder holder = new ColorHolder(1080, 1920);
 2、Implements ColorHolder.ColorStrategy or use provided strategy to generate color array, and put your next operates in the Callback
 
 ```java
-holder.setStrategy(new Mandelbrot1())
-        .setCallback(new ColorHolder.Callback() {
-            @Override
-            public void onColorsCreated() {
-                // create a bitmap using the color array generated just now
-                Bitmap bitmap = holder.createBitmap();
-                // show the bitmap
-                imageView.setImageBitmap(bitmap);
-                // write the bitmap to storage
-                FileUtils.writeBitmapToStorage(bitmap);
-            }
-        })
-        .startInParallel();
+    BitmapGenerator.Callback callback = new BitmapGenerator.SimpleCallback() {
+        @Override
+        public void onBitmapCreated(Bitmap bitmap) {
+            // do something with the bitmap
+        }
+    };
+    new BitmapGenerator.Builder(callback)
+            .setWidth(512)
+            .setHeight(512)
+            .setColorStrategy(/* custom strategy */)
+            .build()
+            .startInParallel();
 ```
 
 *When implements ColorHolder.ColorStrategy, you should implements the three methods below:*

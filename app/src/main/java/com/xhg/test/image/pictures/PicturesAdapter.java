@@ -67,11 +67,11 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
     @Override
     public void onBindViewHolder(final PicturesViewHolder holder,
                                  final int position) {
-//        final ColorGenerator colorHolder = new ColorGenerator(504, 504);
+//        final BitmapGenerator colorHolder = new BitmapGenerator(504, 504);
 //        colorHolder.setStrategy(mPictures.get(position).getStrategy());
-//        colorHolder.setCallback(new ColorGenerator.SimpleCallback() {
+//        colorHolder.setCallback(new BitmapGenerator.SimpleCallback() {
 //            @Override
-//            public void onColorsCreated() {
+//            public void onBitmapCreated() {
 //                holder.imageView.setImageBitmap(colorHolder.createBitmap());
 //            }
 //        }).startInParallel();

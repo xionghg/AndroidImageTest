@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.StrategyFactory;
-import com.xhg.test.image.strategies.ColorGenerator;
+import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.utils.FileUtils;
 
@@ -28,7 +28,7 @@ import java.util.Locale;
 public class PictureDetailActivity extends AppCompatActivity {
     private static final String TAG = "TestBitmap-BigImage";
     public static final String EXTRA_PICTURE_ID = "extra_picture_id";
-    private ColorGenerator mHolder;
+    private BitmapGenerator mHolder;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
     private TextView mProgressTextView;
@@ -51,7 +51,7 @@ public class PictureDetailActivity extends AppCompatActivity {
         int index = getIntent().getIntExtra(EXTRA_PICTURE_ID, 0);
         mStrategyModel = StrategyFactory.getInstance();
         mStrategy = mStrategyModel.getStrategy(index);
-        ColorGenerator.Callback callback = new ColorGenerator.SimpleCallback() {
+        BitmapGenerator.Callback callback = new BitmapGenerator.SimpleCallback() {
             @Override
             public void onStart() {
                 mStartButton.setEnabled(false);
@@ -67,7 +67,7 @@ public class PictureDetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onColorsCreated(Bitmap bitmap) {
+            public void onBitmapCreated(Bitmap bitmap) {
                 Log.d(TAG, "ColorHolder: set color end");
                 mBitmap = bitmap;
                 mImageView.setImageBitmap(bitmap);
@@ -75,7 +75,7 @@ public class PictureDetailActivity extends AppCompatActivity {
                 mSaveButton.setEnabled(true);
             }
         };
-        mHolder = new ColorGenerator.Builder(callback)
+        mHolder = new BitmapGenerator.Builder(callback)
                 .setColorStrategy(mStrategy)
                 .build();
     }

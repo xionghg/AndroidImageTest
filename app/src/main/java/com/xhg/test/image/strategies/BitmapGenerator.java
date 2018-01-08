@@ -4,101 +4,96 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 位图生成器，根据颜色生成策略生成相应的位图，只供单次使用
+ *
  * @author xionghg
  * @created 2017-07-04.
  */
 
-public class ColorGenerator {
-
+public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final String TAG = "ColorHolder";
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
-    private static AtomicInteger sId = new AtomicInteger(1);
+    private static final int OPAQUE = 0xff000000;  // 完全不透明
+
     private final AtomicInteger resultCount = new AtomicInteger(0);
     private final AtomicInteger successCount = new AtomicInteger(0);
     private String mName;
     private int mHeight;
     private int mWidth;
-    private int mAlpha = 0xff << 24;
+    /**
+     * 位图alpha值, 初始为完全不透明
+     */
+    private int mAlpha = OPAQUE;
+    /**
+     * 并行线程数, 可设置为1~20
+     */
     private int mRealParallelCount = PARALLEL_COUNT;
+    /**
+     * 颜色生成策略
+     */
     private ColorStrategy mStrategy;
+    /**
+     * 回调，必需指定
+     */
     private Callback mCallback;
+    /**
+     * 颜色数组，占用内存大，使用后回收
+     */
     private int[] mColorArray;
+    /**
+     * 回调数组
+     */
     private int[] mProgress;
+    /**
+     * 生成器状态
+     */
     private volatile Status mStatus = Status.PENDING;
 
-    public void setRealParallelCount(int realParallelCount) {
-        mRealParallelCount = realParallelCount;
-    }
-
-    private ColorGenerator(Builder builder) {
+    private BitmapGenerator(Builder builder) {
         setName(builder.name);
         setCallback(builder.callback);
-        setWidthAndHeight(builder.width, builder.height);
+        setWidth(builder.width);
+        setHeight(builder.height);
         setStrategy(builder.colorStrategy);
     }
 
-    public void setWidthAndHeight(int width, int height) {
-        if (numberWrong(width) || numberWrong(height)) {
-            throw new IllegalArgumentException("params not right");
-        }
-        this.mWidth = width;
-        this.mHeight = height;
-        mColorArray = new int[width * height];
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        this.mName = name;
-    }
-
-    private boolean numberWrong(int number) {
-        return (number <= 0 || number > 10000);
-    }
-
-    /**
-     * Create a bitmap using the color array created.
-     *
-     * @return Null if mStatus is not Status.FINISHED, always invoke this method in CallBack.
-     */
-    public Bitmap createBitmap() {
+    private Bitmap createBitmap() {
         if (mStatus != Status.FINISHED) {
             return null;
         }
-        return Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        mColorArray = null;
+        return bitmap;
     }
 
     private void updateProgress(int index, int progress) {
-        if (mCallback != null) {
-            mProgress[index] = progress;
-            int current = 0;
-            int total = 0;
-            for (int p : mProgress) {
-                current += p;
-                total += 100;
-            }
-            mCallback.onProgressUpdate(current * 100 / total);
+        mProgress[index] = progress;
+        int current = 0;
+        int total = 0;
+        for (int p : mProgress) {
+            current += p;
+            total += 100;
         }
+        mCallback.onProgressUpdate(current * 100 / total);
     }
 
     private void createColorFinish() {
         Log.d(TAG, "create color finish: ");
         mStatus = Status.FINISHED;
         mStrategy.recycle(); // release after finished
-        if (mCallback != null) {
-            if (successCount.get() == mProgress.length) {
-                mCallback.onProgressUpdate(100);
-                mCallback.onColorsCreated(createBitmap());
-            } else {
-                mCallback.onProgressUpdate(0);
-                mCallback.onError();
-            }
+
+        if (successCount.get() == mProgress.length) {
+            mCallback.onProgressUpdate(100);
+            mCallback.onBitmapCreated(createBitmap());
+        } else {
+            mCallback.onProgressUpdate(0);
+            mCallback.onError("finish error: wrong count");
         }
         resultCount.set(0);
         successCount.set(0);
@@ -107,16 +102,16 @@ public class ColorGenerator {
     private void startCreateColor(boolean inParallel) {
         Log.d(TAG, "create color startCreateColor: cpu_count=" + CPU_COUNT);
         mStatus = Status.RUNNING;
+        // 开始之后才分配内存
+        mColorArray = new int[mWidth * mHeight];
 
+        // Initialize a strategy if not specified
         if (mStrategy == null) {
-            // Initialize a strategy if not specified
             mStrategy = new Mandelbrot1();
         }
         mStrategy.setWidthAndHeight(mWidth, mHeight);   //init() will be called in this method
 
-        if (mCallback != null) {
-            mCallback.onStart();
-        }
+        mCallback.onStart();
 
         if (inParallel) {
             mProgress = new int[mRealParallelCount];
@@ -135,62 +130,83 @@ public class ColorGenerator {
         }
     }
 
+    // 开始并行执行
     public void startInParallel() {
         startCreateColor(mHeight > 300 || mColorArray.length > 100000);
     }
 
+    // 开始串行执行
     public void startInSerial() {
         startCreateColor(false);
+    }
+
+    /**
+     * 检查数据是否合理，闭区间
+     */
+    private static int checkNumber(int number, int left, int right) {
+        if (number < left || number > right) {
+            throw new IllegalArgumentException(String.format(Locale.US, "params not right, should between %d and %d, actually is %d",
+                    left, right, number));
+        }
+        return number;
+    }
+
+    // get and set begin
+    public void setRealParallelCount(int realParallelCount) {
+        mRealParallelCount = checkNumber(realParallelCount, 1, 20);
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        this.mName = name;
     }
 
     public int getHeight() {
         return mHeight;
     }
 
+    public void setHeight(int height) {
+        mHeight = checkNumber(height, 1, 10000);
+    }
+
     public int getWidth() {
         return mWidth;
+    }
+
+    public void setWidth(int width) {
+        mWidth = checkNumber(width, 1, 10000);
     }
 
     public ColorStrategy getStrategy() {
         return mStrategy;
     }
 
-    public ColorGenerator setStrategy(ColorStrategy strategy) {
+    public void setStrategy(ColorStrategy strategy) {
         mStrategy = strategy;
-        return this;
     }
 
     public Callback getCallback() {
         return mCallback;
     }
 
-    public ColorGenerator setCallback(Callback callback) {
-        mCallback = callback;
+    public BitmapGenerator setCallback(Callback callback) {
+        mCallback = Objects.requireNonNull(callback);
         return this;
     }
 
-    /**
-     * Cause mColorArray is generated by ColorStrategy, so there is no
-     * setColorArray() method, use setStrategy() instead.
-     *
-     * @return mColorArray
-     */
-    public int[] getColorArray() {
-        return mColorArray;
-    }
-
-    /**
-     * Set the alpha value for the Bitmap if you want
-     */
     public void setAlpha(int alpha) {
         mAlpha = alpha;
     }
+    // get and set end
 
     /**
-     * Indicates the current status of the holder.
+     * Indicates the current status of the generator.
      */
     public enum Status {
-        PENDING, RUNNING, FINISHED,
+        PENDING, RUNNING, FINISHED
     }
 
     /**
@@ -211,12 +227,33 @@ public class ColorGenerator {
         /**
          * Called when colors has been created.
          */
-        void onColorsCreated(Bitmap bitmap);
+        void onBitmapCreated(Bitmap bitmap);
 
         /**
          * Called when errors happened.
          */
-        void onError();
+        void onError(String errorMsg);
+    }
+
+    /**
+     * An implementation of {@link BitmapGenerator.Callback} that has empty method bodies and
+     * default return values.
+     */
+    public static abstract class SimpleCallback implements Callback {
+        @Override
+        public void onStart() {
+        }
+
+        @Override
+        public void onProgressUpdate(int progress) {
+        }
+
+        @Override
+        public abstract void onBitmapCreated(Bitmap bitmap);
+
+        @Override
+        public void onError(String errorMsg) {
+        }
     }
 
     public static class Builder {
@@ -250,33 +287,12 @@ public class ColorGenerator {
             return this;
         }
 
-        public ColorGenerator build() { // 构建，返回一个新对象
-            return new ColorGenerator(this);
+        public BitmapGenerator build() { // 构建，返回一个新对象
+            return new BitmapGenerator(this);
         }
 
         public void start() { // 构建，返回一个新对象
             build().startInParallel();
-        }
-    }
-
-    /**
-     * An implementation of {@link ColorGenerator.Callback} that has empty method bodies and
-     * default return values.
-     */
-    public static abstract class SimpleCallback implements Callback {
-        @Override
-        public void onStart() {
-        }
-
-        @Override
-        public void onProgressUpdate(int progress) {
-        }
-
-        @Override
-        public abstract void onColorsCreated(Bitmap bitmap);
-
-        @Override
-        public void onError() {
         }
     }
 
@@ -321,9 +337,9 @@ public class ColorGenerator {
         }
 
         @Override
-        protected void onPostExecute(Boolean execRight) {
+        protected void onPostExecute(Boolean success) {
             Log.d(TAG, mName + " onPostExecute called");
-            if (execRight) {
+            if (success) {
                 successCount.getAndIncrement();
             }
             if (resultCount.incrementAndGet() == mProgress.length) {

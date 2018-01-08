@@ -16,7 +16,7 @@ public class GeneratorManger {
 
     private static GeneratorManger INSTANCE;
 
-    private List<ColorGenerator> mWorkingGenerators;
+    private List<BitmapGenerator> mWorkingGenerators;
 
     public static GeneratorManger getInstance() {
         if (INSTANCE == null) {
@@ -40,23 +40,23 @@ public class GeneratorManger {
 
         int setGeneratorSize();
 
-        ColorGenerator onCreateGenerator(int index);
+        BitmapGenerator onCreateGenerator(int index);
 
-        void onGenerateFinished(ColorGenerator generator, Picture data);
+        void onGenerateFinished(BitmapGenerator generator, Picture data);
     }
 
     public void initGenerator(GeneratorCallback callback) {
         mGeneratorCallback = requireNonNull(callback);
         int size = mGeneratorCallback.setGeneratorSize();
         for (int i = 0; i < size; i++) {
-            ColorGenerator generator = mGeneratorCallback.onCreateGenerator(i);
+            BitmapGenerator generator = mGeneratorCallback.onCreateGenerator(i);
             mWorkingGenerators.add(generator);
         }
     }
 
     public void start() {
-        for (ColorGenerator generator : mWorkingGenerators) {
-            if (mWorkingGenerators.size() > ColorGenerator.CPU_COUNT) {
+        for (BitmapGenerator generator : mWorkingGenerators) {
+            if (mWorkingGenerators.size() > BitmapGenerator.CPU_COUNT) {
                 generator.setRealParallelCount(2);
             }
             generator.startInParallel();

@@ -7,7 +7,7 @@ import android.util.Log;
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.data.source.PicturesRepository;
-import com.xhg.test.image.strategies.ColorGenerator;
+import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
 
 import java.util.ArrayList;
@@ -57,15 +57,15 @@ public class PicturesPresenter implements PicturesContract.Presenter,
     private void startGenerateColor() {
         for (int i = 0; i < 2/*mCurrentPictures.size()*/; i++) {
             final int index = i;
-            ColorGenerator.Callback callback = new ColorGenerator.SimpleCallback() {
+            BitmapGenerator.Callback callback = new BitmapGenerator.SimpleCallback() {
                 @Override
-                public void onColorsCreated(Bitmap bitmap) {
+                public void onBitmapCreated(Bitmap bitmap) {
                     mCurrentPictures.get(index).setBitmap(bitmap);
                     mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
                 }
             };
             Log.e(TAG, "start generator" + i);
-            new ColorGenerator.Builder(callback)
+            new BitmapGenerator.Builder(callback)
                     .setWidth(512)
                     .setHeight(512)
                     .setColorStrategy(mCurrentPictures.get(index).getStrategy())
