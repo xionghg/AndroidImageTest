@@ -12,7 +12,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,6 +25,7 @@ import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.picturedetail.PictureDetailActivity;
 import com.xhg.test.image.settings.SettingsActivity;
+import com.xhg.test.image.utils.Log;
 
 import java.util.List;
 import java.util.Objects;

@@ -6,11 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
 
 import com.xhg.test.image.imageloader.disklrucache.DiskLruCache;
+import com.xhg.test.image.utils.Log;
 
 import java.io.File;
 import java.io.IOException;

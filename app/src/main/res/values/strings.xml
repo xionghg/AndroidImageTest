@@ -5,6 +5,7 @@
     <string name="no_progress">no progress</string>
     <string name="button_text_start">Start</string>
     <string name="button_text_save">Save</string>
+    <string name="button_text_cut">Cut</string>
 
     <!-- settings -->
     <string name="title_activity_setting">Settings</string>

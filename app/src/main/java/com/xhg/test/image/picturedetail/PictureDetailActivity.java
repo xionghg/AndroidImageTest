@@ -1,6 +1,7 @@
 package com.xhg.test.image.picturedetail;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -22,18 +22,20 @@ import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
 import com.xhg.test.image.utils.FileUtils;
+import com.xhg.test.image.utils.Log;
 
 import java.util.Locale;
 
 public class PictureDetailActivity extends AppCompatActivity {
     private static final String TAG = "TestBitmap-BigImage";
     public static final String EXTRA_PICTURE_ID = "extra_picture_id";
-    private BitmapGenerator mHolder;
+    private BitmapGenerator mGenerator;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
     private TextView mProgressTextView;
     private Button mStartButton;
     private Button mSaveButton;
+    private Button mCutButton;
     private Bitmap mBitmap;
     private StrategyFactory mStrategyModel;
     private ColorStrategy mStrategy;
@@ -75,9 +77,17 @@ public class PictureDetailActivity extends AppCompatActivity {
                 mSaveButton.setEnabled(true);
             }
         };
-        mHolder = new BitmapGenerator.Builder(callback)
+        mGenerator = new BitmapGenerator.Builder(callback)
                 .setColorStrategy(mStrategy)
                 .build();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mBitmap != null && !mBitmap.isRecycled()) {
+            mBitmap.recycle();
+        }
     }
 
     private void updateProgress(int progress) {
@@ -94,7 +104,7 @@ public class PictureDetailActivity extends AppCompatActivity {
         mStartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mHolder.startInParallel();
+                mGenerator.startInParallel();
             }
         });
         mSaveButton = (Button) findViewById(R.id.save_button);
@@ -104,12 +114,24 @@ public class PictureDetailActivity extends AppCompatActivity {
                 checkPermissionAndSave();
             }
         });
+        mCutButton = (Button) findViewById(R.id.cut_button);
     }
 
     private void savePicture() {
         String path = FileUtils.writeBitmapToStorage(mBitmap);
         if (!TextUtils.isEmpty(path)) {
             Toast.makeText(PictureDetailActivity.this, "Picture has saved to " + path, Toast.LENGTH_SHORT).show();
+
+            final String picPath = path;
+            mCutButton.setEnabled(true);
+            mCutButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(PictureDetailActivity.this, PictureCutActivity.class);
+                    intent.putExtra("pic_path", picPath);
+                    startActivity(intent);
+                }
+            });
         }
     }
 

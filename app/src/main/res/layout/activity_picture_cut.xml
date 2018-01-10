@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/spacing_small"
+    tools:context="com.xhg.test.image.picturedetail.PictureCutActivity">
+
+
+    <TextView
+        android:id="@+id/head_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="origin picture:"/>
+
+    <ImageView
+        android:id="@+id/origin_pic"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/head_text"
+        android:background="#50654321"/>
+
+    <TextView
+        android:id="@+id/pic_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/origin_pic"
+        android:text="picture info:"/>
+
+
+    <LinearLayout
+        android:id="@+id/gen_pic_views"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/origin_pic"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Small Pic:"/>
+
+            <ImageView
+                android:id="@+id/pic_small"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="#5f654321"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Big Pic:"/>
+
+            <ImageView
+                android:id="@+id/pic_big"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="#5f654321"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/bottom_buttons"
+        android:orientation="horizontal"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="top:"/>
+
+        <EditText
+            android:id="@+id/top_value"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="left:"/>
+
+        <EditText
+            android:id="@+id/left_value"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="bottom:"/>
+
+        <EditText
+            android:id="@+id/bottom_value"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="right:"/>
+
+        <EditText
+            android:id="@+id/right_value"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="px"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/gen_small_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gen Small Pic"
+            android:textAllCaps="false"
+            />
+
+        <Button
+            android:id="@+id/gen_big_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gen Big Pic"
+            android:textAllCaps="false"
+            />
+    </LinearLayout>
+
+</RelativeLayout>

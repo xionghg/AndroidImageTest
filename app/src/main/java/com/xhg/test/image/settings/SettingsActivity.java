@@ -7,10 +7,10 @@ import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.xhg.test.image.R;
+import com.xhg.test.image.utils.Log;
 
 /**
  * @author xionghg

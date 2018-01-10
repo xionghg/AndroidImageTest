@@ -2,13 +2,13 @@ package com.xhg.test.image.pictures;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.xhg.test.image.data.Picture;
 import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.data.source.PicturesRepository;
 import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
+import com.xhg.test.image.utils.Log;
 
 import java.util.ArrayList;
 import java.util.List;

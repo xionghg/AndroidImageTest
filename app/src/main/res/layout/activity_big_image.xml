@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/spacing_normal"
+    android:padding="@dimen/spacing_small"
     tools:context="com.xhg.test.image.picturedetail.PictureDetailActivity">
 
     <TextView
@@ -12,12 +12,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/spacing_small"
         android:text="@string/label_text" />
 
     <RelativeLayout
         android:id="@+id/image_container"
         android:layout_width="match_parent"
-        android:layout_height="370dp"
+        android:layout_height="344dp"
         android:layout_below="@+id/text">
 
         <ImageView
@@ -68,6 +69,14 @@
             android:layout_height="wrap_content"
             android:enabled="false"
             android:text="@string/button_text_save"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/cut_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="@string/button_text_cut"
             android:textAllCaps="false" />
     </LinearLayout>
 

@@ -2,7 +2,8 @@ package com.xhg.test.image.strategies;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.xhg.test.image.utils.Log;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final String TAG = "ColorHolder";
+    private static final String TAG = "BitmapGenerator";
     private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
     private static final int OPAQUE = 0xff000000;  // 完全不透明
 
@@ -31,7 +32,7 @@ public class BitmapGenerator {
      */
     private int mAlpha = OPAQUE;
     /**
-     * 并行线程数, 可设置为1~20
+     * 并行线程数, 可设置为1~20, 过大或过小都会影响效率
      */
     private int mRealParallelCount = PARALLEL_COUNT;
     /**
@@ -39,7 +40,7 @@ public class BitmapGenerator {
      */
     private ColorStrategy mStrategy;
     /**
-     * 回调，必需指定
+     * 回调，必需非空
      */
     private Callback mCallback;
     /**

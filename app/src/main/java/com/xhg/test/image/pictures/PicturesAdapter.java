@@ -2,7 +2,6 @@ package com.xhg.test.image.pictures;
 
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,7 @@ import android.widget.ImageView;
 
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
+import com.xhg.test.image.utils.Log;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
 
 public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.PicturesViewHolder> {
 
-    private static final String TAG = "TestBitmap-MainAdapter";
+    private static final String TAG = "MainAdapter";
 
     private List<Picture> mPictures;
 
