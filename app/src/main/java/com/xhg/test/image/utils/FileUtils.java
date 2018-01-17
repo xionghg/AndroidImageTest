@@ -26,7 +26,9 @@ public class FileUtils {
         File parent_path = Environment.getExternalStorageDirectory();
         // 可以建立一个子目录专门存放自己专属文件
         File dir = new File(parent_path.getAbsoluteFile(), "testbitmap");
-        dir.mkdir();
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.CHINA);
         String timeStr = sdf.format(new Date());
