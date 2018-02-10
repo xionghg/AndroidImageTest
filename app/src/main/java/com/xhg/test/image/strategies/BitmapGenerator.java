@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 
 import com.xhg.test.image.utils.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -19,11 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final String TAG = "BitmapGenerator";
-    private static final int PARALLEL_COUNT = Math.max(2, Math.min(CPU_COUNT - 1, 8));
     private static final int OPAQUE = 0xff000000;  // 完全不透明
 
-    private final AtomicInteger resultCount = new AtomicInteger(0);
-    private final AtomicInteger successCount = new AtomicInteger(0);
     private String mName;
     private int mHeight;
     private int mWidth;
@@ -31,10 +30,6 @@ public class BitmapGenerator {
      * 位图alpha值, 初始为完全不透明
      */
     private int mAlpha = OPAQUE;
-    /**
-     * 并行线程数, 可设置为1~20, 过大或过小都会影响效率
-     */
-    private int mRealParallelCount = PARALLEL_COUNT;
     /**
      * 颜色生成策略
      */
@@ -47,10 +42,6 @@ public class BitmapGenerator {
      * 颜色数组，占用内存大，使用后回收
      */
     private int[] mColorArray;
-    /**
-     * 回调数组
-     */
-    private int[] mProgress;
     /**
      * 生成器状态
      */
@@ -73,39 +64,22 @@ public class BitmapGenerator {
         return bitmap;
     }
 
-    private void updateProgress(int index, int progress) {
-        mProgress[index] = progress;
-        int current = 0;
-        int total = 0;
-        for (int p : mProgress) {
-            current += p;
-            total += 100;
-        }
-        mCallback.onProgressUpdate(current * 100 / total);
+    private void updateProgress(int progress) {
+        mCallback.onProgressUpdate(progress);
     }
 
-    private void createColorFinish() {
-        Log.d(TAG, "create color finish: ");
+    private void generatePixelFinished() {
+        Log.d(TAG, "generate pixel finished");
         mStatus = Status.FINISHED;
         mStrategy.recycle(); // release after finished
-
-        if (successCount.get() == mProgress.length) {
-            mCallback.onProgressUpdate(100);
-            mCallback.onBitmapCreated(createBitmap());
-        } else {
-            mCallback.onProgressUpdate(0);
-            mCallback.onError("finish error: wrong count");
-        }
-        resultCount.set(0);
-        successCount.set(0);
+        mCallback.onBitmapCreated(createBitmap());
     }
 
-    private void startCreateColor(boolean inParallel) {
-        Log.d(TAG, "create color startCreateColor: cpu_count=" + CPU_COUNT);
+    private void startGeneratePixel(boolean inParallel) {
+        Log.d(TAG, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
         mStatus = Status.RUNNING;
         // 开始之后才分配内存
         mColorArray = new int[mWidth * mHeight];
-
         // Initialize a strategy if not specified
         if (mStrategy == null) {
             mStrategy = new Mandelbrot1();
@@ -113,32 +87,17 @@ public class BitmapGenerator {
         mStrategy.setWidthAndHeight(mWidth, mHeight);   //init() will be called in this method
 
         mCallback.onStart();
-
-        if (inParallel) {
-            mProgress = new int[mRealParallelCount];
-            int begin;
-            int end = 0;
-            for (int i = 1; i <= mRealParallelCount; i++) {
-                begin = end;
-                end = mHeight * i / mRealParallelCount;
-                // Log.d(TAG, "startCreateColor in parallel, begin=" + begin + " end=" + end);
-                new MyAsyncTask(i - 1, "AsyncTask#" + i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, begin, end);
-            }
-        } else {
-            mProgress = new int[1];
-            // Log.d(TAG, "startCreateColor in serial, begin=0 end=" + mHeight);
-            new MyAsyncTask(0, "AsyncTask#Single").execute(0, mHeight);
-        }
+        new MyAsyncTask(inParallel, 0, mHeight).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     // 开始并行执行
     public void startInParallel() {
-        startCreateColor(mHeight > 300 || mColorArray.length > 100000);
+        startGeneratePixel(mHeight > 300 || mColorArray.length > 100000);
     }
 
     // 开始串行执行
     public void startInSerial() {
-        startCreateColor(false);
+        startGeneratePixel(false);
     }
 
     /**
@@ -150,11 +109,6 @@ public class BitmapGenerator {
                     left, right, number));
         }
         return number;
-    }
-
-    // get and set begin
-    public void setRealParallelCount(int realParallelCount) {
-        mRealParallelCount = checkNumber(realParallelCount, 1, 20);
     }
 
     public String getName() {
@@ -216,7 +170,7 @@ public class BitmapGenerator {
     public interface Callback {
         /**
          * Called before generate colors, add this interface because we always want to do the
-         * same things before startCreateColor generate colors, like set Button to disable.
+         * same things before startGeneratePixel generate colors, like set Button to disable.
          */
         void onStart();
 
@@ -297,55 +251,80 @@ public class BitmapGenerator {
         }
     }
 
-    private class MyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
-        private int mIndex = 0;
-        private String mName = "AsyncTask";
+    private static final AtomicInteger sIndex = new AtomicInteger(0);
 
-        public MyAsyncTask(int index, String name) {
+    private class MyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
+        String mName = "AsyncTask";
+        boolean mInParallel;
+        int mStartHeight;
+        int mEndHeight;
+        int mTotalPoint;
+        int mLastProgress = 0;
+        final AtomicInteger mCurrentPoint = new AtomicInteger(0);
+
+        public MyAsyncTask(boolean inParallel, int start, int end) {
             super();
-            mIndex = index;
-            mName = name;
+            mInParallel = inParallel;
+            mStartHeight = start;
+            mEndHeight = end;
+            mTotalPoint = (end - start) * mWidth;
+            mName = "MyAsyncTask@" + sIndex.incrementAndGet() + "-" + (inParallel ? "1" : "0");
         }
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            Log.v(TAG, mName + " doInBackground:");
-            if (params.length < 2) {
-                return false;
-            }
-            int start = params[0];
-            int end = params[1];
-            //单线程7.869s
-            //2线程4.001s
-            //3线程4.294s  3664 4405 4815
-            //6线程1.773s  1761 1871 1688
-            //7线程1.763s
-            for (int j = start; j < end; j++) {
-                for (int i = 0; i < mWidth; i++) {
-                    int rgb = mStrategy.getRGB(i, j);
-                    mColorArray[j * mWidth + i] = mAlpha | rgb;
+            Log.d(TAG, mName + " doInBackground");
+            // 单线程7.869s; 2线程4.001s; 3线程4.294s  3664 4405 4815;
+            // 6线程1.773s  1761 1871 1688; 7线程1.763s
+
+            List<Point> points = new ArrayList<>(mTotalPoint);
+            for (int y = mStartHeight; y < mEndHeight; y++) {
+                for (int x = 0; x < mWidth; x++) {
+                    points.add(new Point(x, y));
                 }
-                publishProgress(j, start, end);
+            }
+            if (mInParallel) {
+                points.parallelStream().forEach(this::getPixelOnPoint);
+            } else {
+                points.forEach(this::getPixelOnPoint);
             }
             return true;
         }
 
+        private void getPixelOnPoint(Point p) {
+            int rgb = mStrategy.getRGB(p.x, p.y);
+            mColorArray[p.y * mWidth + p.x] = mAlpha | rgb;
+
+            int currentProgress = mCurrentPoint.incrementAndGet() * 100 / mTotalPoint;
+            if (mTotalPoint <= 100) {
+                publishProgress(currentProgress);
+            } else {
+                if (currentProgress > mLastProgress) {
+                    mLastProgress = currentProgress;
+                    publishProgress(mLastProgress);
+                }
+            }
+        }
+
         @Override
         protected void onProgressUpdate(Integer... values) {
-            int total = values[2] - values[1];
-            int current = values[0] - values[1] + 1;
-            updateProgress(mIndex, current * 100 / total);
+            updateProgress(values[0]);
         }
 
         @Override
         protected void onPostExecute(Boolean success) {
-            Log.d(TAG, mName + " onPostExecute called");
-            if (success) {
-                successCount.getAndIncrement();
-            }
-            if (resultCount.incrementAndGet() == mProgress.length) {
-                createColorFinish();
-            }
+            Log.d(TAG, mName + " onPostExecute");
+            generatePixelFinished();
+        }
+    }
+
+    static class Point {
+        int x;
+        int y;
+
+        Point(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
     }
 }

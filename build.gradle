@@ -27,7 +27,7 @@ task clean(type: Delete) {
 // 统一定义版本号
 ext {
     // Sdk and tools
-    minSdkVersion = 19
+    minSdkVersion = 24
     targetSdkVersion = 25
     compileSdkVersion = 26
     buildToolsVersion = "26.0.3"

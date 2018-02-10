@@ -50,13 +50,13 @@ public interface ColorStrategy {
 
     /**
      * Called before strategy start.
-     * Override this method if some initial operation are needed.
+     * Override this method if some initial operations are needed.
      */
     void init();
 
     /**
      * Called after strategy finish.
-     * Override this method if some release operation are needed.
+     * Override this method if some release operations are needed.
      */
     void recycle();
 

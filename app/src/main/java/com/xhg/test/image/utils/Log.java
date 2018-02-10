@@ -16,7 +16,7 @@ public class Log {
     private static final int WARN    = android.util.Log.WARN;
     private static final int ERROR   = android.util.Log.ERROR;
 
-    public static final int LOG_LEVEL = DEBUG;
+    public static final int LOG_LEVEL = VERBOSE;
 
     public static int v(String tag, String msg) {
         if (LOG_LEVEL <= VERBOSE && !TextUtils.isEmpty(msg)) {
