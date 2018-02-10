@@ -2,12 +2,13 @@ package com.xhg.test.image.strategies;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 
 import com.xhg.test.image.utils.Log;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,19 +25,21 @@ public class BitmapGenerator {
     private static final int OPAQUE = 0xff000000;  // 完全不透明
 
     private String mName;
+    @IntRange(from = 1, to = 10000)
     private int mHeight;
+    @IntRange(from = 1, to = 10000)
     private int mWidth;
-    /**
-     * 位图alpha值, 初始为完全不透明
-     */
+    @IntRange(from = 1, to = 255)
     private int mAlpha = OPAQUE;
     /**
      * 颜色生成策略
      */
+    @NonNull
     private ColorStrategy mStrategy;
     /**
-     * 回调，必需非空
+     * 回调
      */
+    @NonNull
     private Callback mCallback;
     /**
      * 颜色数组，占用内存大，使用后回收
@@ -48,11 +51,11 @@ public class BitmapGenerator {
     private volatile Status mStatus = Status.PENDING;
 
     private BitmapGenerator(Builder builder) {
-        setName(builder.name);
-        setCallback(builder.callback);
+        mName = builder.name;
+        mCallback = Objects.requireNonNull(builder.callback);
         setWidth(builder.width);
         setHeight(builder.height);
-        setStrategy(builder.colorStrategy);
+        mStrategy = Objects.requireNonNull(builder.colorStrategy);
     }
 
     private Bitmap createBitmap() {
@@ -80,10 +83,6 @@ public class BitmapGenerator {
         mStatus = Status.RUNNING;
         // 开始之后才分配内存
         mColorArray = new int[mWidth * mHeight];
-        // Initialize a strategy if not specified
-        if (mStrategy == null) {
-            mStrategy = new Mandelbrot1();
-        }
         mStrategy.setWidthAndHeight(mWidth, mHeight);   //init() will be called in this method
 
         mCallback.onStart();
@@ -100,13 +99,11 @@ public class BitmapGenerator {
         startGeneratePixel(false);
     }
 
-    /**
-     * 检查数据是否合理，闭区间
-     */
+    // 检查数据是否合理，闭区间
     private static int checkNumber(int number, int left, int right) {
         if (number < left || number > right) {
-            throw new IllegalArgumentException(String.format(Locale.US, "params not right, should between %d and %d, actually is %d",
-                    left, right, number));
+            throw new IllegalArgumentException("params not right, should between " + left +
+                    " and " + right + ", actually is " + number);
         }
         return number;
     }
@@ -116,7 +113,7 @@ public class BitmapGenerator {
     }
 
     public void setName(String name) {
-        this.mName = name;
+        mName = name;
     }
 
     public int getHeight() {
@@ -147,13 +144,12 @@ public class BitmapGenerator {
         return mCallback;
     }
 
-    public BitmapGenerator setCallback(Callback callback) {
+    public void setCallback(Callback callback) {
         mCallback = Objects.requireNonNull(callback);
-        return this;
     }
 
     public void setAlpha(int alpha) {
-        mAlpha = alpha;
+        mAlpha = checkNumber(alpha, 1, 255);
     }
     // get and set end
 
@@ -218,8 +214,12 @@ public class BitmapGenerator {
         private ColorStrategy colorStrategy;
         private Callback callback;
 
-        public Builder(Callback callback) {
+        public Builder() {
+        }
+
+        public Builder setCallBack(Callback callback) {
             this.callback = callback;
+            return this;
         }
 
         public Builder setName(String name) {
