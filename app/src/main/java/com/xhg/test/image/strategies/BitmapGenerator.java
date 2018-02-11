@@ -29,7 +29,7 @@ public class BitmapGenerator {
     private int mHeight;
     @IntRange(from = 1, to = 10000)
     private int mWidth;
-    @IntRange(from = 1, to = 255)
+
     private int mAlpha = OPAQUE;
     /**
      * 颜色生成策略
@@ -83,7 +83,7 @@ public class BitmapGenerator {
         mStatus = Status.RUNNING;
         // 开始之后才分配内存
         mColorArray = new int[mWidth * mHeight];
-        mStrategy.setWidthAndHeight(mWidth, mHeight);   //init() will be called in this method
+        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
 
         mCallback.onStart();
         new MyAsyncTask(inParallel, 0, mHeight).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -149,7 +149,7 @@ public class BitmapGenerator {
     }
 
     public void setAlpha(int alpha) {
-        mAlpha = checkNumber(alpha, 1, 255);
+        mAlpha = checkNumber(alpha, 1, 255) << 24;
     }
     // get and set end
 

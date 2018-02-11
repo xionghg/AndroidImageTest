@@ -39,15 +39,22 @@ public abstract class CombinedRGBColorStrategy implements ColorStrategy {
 
     protected int WIDTH;
     protected int HEIGHT;
+    protected int ALPHA;
 
     @Override
-    public void setWidthAndHeight(int width, int height) {
+    public void setParameters(int alpha, int width, int height) {
+        ALPHA = alpha;
         WIDTH = width;
         HEIGHT = height;
         init();
     }
 
     protected int generateRGB(int r, int g, int b) {
-        return (r % 256 << 16) | (g % 256 << 8) | (b % 256);
+        return ALPHA | (r % 256 << 16) | (g % 256 << 8) | (b % 256);
+    }
+
+    @Override
+    public String getDescription() {
+        return "CombinedRGBColorStrategy";
     }
 }

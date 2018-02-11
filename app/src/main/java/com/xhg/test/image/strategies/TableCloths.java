@@ -24,4 +24,9 @@ public class TableCloths extends CombinedRGBColorStrategy {
         double k = (DIM * 2 - x) * h + i;
         return new double[]{j, k};
     }
+
+    @Override
+    public String getDescription() {
+       return  "TableCloths";
+    }
 }

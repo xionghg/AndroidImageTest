@@ -26,11 +26,7 @@ public abstract class SeparateRGBColorStrategy implements ColorStrategy {
      * @return RGB values of pixel
      */
     public int getRGB(int x, int y) {
-        int rgb = 0;
-        rgb |= (getRed(x, y) % 256) << 16;
-        rgb |= (getGreen(x, y) % 256) << 8;
-        rgb |= (getBlue(x, y) % 256);
-        return rgb;
+        return ALPHA | (getRed(x, y) % 256 << 16) | (getGreen(x, y) % 256 << 8) | (getBlue(x, y) % 256);
     }
 
     @Override
@@ -41,13 +37,20 @@ public abstract class SeparateRGBColorStrategy implements ColorStrategy {
     public void recycle() {
     }
 
-    private int WIDTH;
-    private int HEIGHT;
+    protected int WIDTH;
+    protected int HEIGHT;
+    protected int ALPHA;
 
     @Override
-    public void setWidthAndHeight(int width, int height) {
+    public void setParameters(int alpha, int width, int height) {
+        ALPHA = alpha;
         WIDTH = width;
         HEIGHT = height;
         init();
+    }
+
+    @Override
+    public String getDescription() {
+        return "SeparateRGBColorStrategy";
     }
 }

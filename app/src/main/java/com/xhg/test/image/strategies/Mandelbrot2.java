@@ -26,4 +26,9 @@ public class Mandelbrot2 extends CombinedRGBColorStrategy {
         int b = (int) (255 * Math.pow((n - 80) / 800, .5));
         return generateRGB(r, g, b);
     }
+
+    @Override
+    public String getDescription() {
+        return "Mandelbrot2";
+    }
 }

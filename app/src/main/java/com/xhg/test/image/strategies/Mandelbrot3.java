@@ -24,4 +24,9 @@ public class Mandelbrot3 extends CombinedRGBColorStrategy {
         int b = 4 * r;
         return generateRGB(r, g, b);
     }
+
+    @Override
+    public String getDescription() {
+        return "Mandelbrot3";
+    }
 }

@@ -25,9 +25,13 @@ public class Mandelbrot1 extends CombinedRGBColorStrategy {
     @Override
     public int getRGB(int x, int y) {
         int k = getK(x, y);
-        int r = (int) (Math.log(k) * 47) % 256 << 16;
-        int g = r >> 8;
-        int b = (128 - (int) (Math.log(k) * 23)) % 256;
-        return r | g | b;
+        int r = (int) (Math.log(k) * 47);
+        int b = 128 - (int) (Math.log(k) * 23);
+        return generateRGB(r, r, b);
+    }
+
+    @Override
+    public String getDescription() {
+        return "Mandelbrot1";
     }
 }

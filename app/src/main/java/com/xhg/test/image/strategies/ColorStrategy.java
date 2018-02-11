@@ -63,8 +63,16 @@ public interface ColorStrategy {
     /**
      * Set max width and height if needed.
      *
+     * @param alpha
      * @param width
      * @param height
      */
-    void setWidthAndHeight(int width, int height);
+    void setParameters(int alpha, int width, int height);
+
+    /**
+     *
+     * @return strategy description
+     */
+    String getDescription();
+
 }

@@ -8,11 +8,26 @@ import java.util.List;
  * @created 2017-07-16.
  */
 
-public class RandomPainter extends CombinedRGBColorStrategy {
+public class RandomPainter extends SeparateRGBColorStrategy {
 
     private char[][] r;
     private char[][] g;
     private char[][] b;
+
+    @Override
+    public int getRed(int x, int y) {
+        return (int) getColor(r, x, y);
+    }
+
+    @Override
+    public int getGreen(int x, int y) {
+        return (int) getColor(g, x, y);
+    }
+
+    @Override
+    public int getBlue(int x, int y) {
+        return (int) getColor(b, x, y);
+    }
 
     private char random(int n) {
         return (char) (1024 * Math.random() % n);
@@ -69,17 +84,14 @@ public class RandomPainter extends CombinedRGBColorStrategy {
     }
 
     @Override
-    public int getRGB(int x, int y) {
-        int red = (int) getColor(r, x, y);
-        int green = (int) getColor(g, x, y);
-        int blue = (int) getColor(b, x, y);
-        return generateRGB(red, green, blue);
-    }
-
-    @Override
     public void recycle() {
         r = null;
         g = null;
         b = null;
+    }
+
+    @Override
+    public String getDescription() {
+        return "RandomPainter";
     }
 }
