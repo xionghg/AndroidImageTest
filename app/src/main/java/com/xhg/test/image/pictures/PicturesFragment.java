@@ -37,7 +37,6 @@ import java.util.Objects;
  */
 
 public class PicturesFragment extends Fragment implements PicturesContract.View {
-
     private static final String TAG = "PicturesFragment";
 
     private PicturesContract.Presenter mPresenter;
@@ -45,7 +44,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
 
     private Button mToButton;
     private RecyclerView mRecyclerView;
-
+    private SwipeRefreshLayout mRefreshLayout;
     private RelativeLayout mPicturesView;
 
     public PicturesFragment() {
@@ -73,6 +72,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
     public void onStop() {
         super.onStop();
         mPresenter.registerRepositoryCallBack(false);
+        mPresenter.cancelCurrentOperation();
     }
 
     @Override
@@ -100,22 +100,18 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
         mPicturesView = (RelativeLayout) root.findViewById(R.id.picturesRL);
 
         // Set up progress indicator
-        final SwipeRefreshLayout swipeRefreshLayout =
-                (SwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
-        swipeRefreshLayout.setColorSchemeColors(
+        mRefreshLayout = (SwipeRefreshLayout) root.findViewById(R.id.refresh_layout);
+        mRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         // Set the scrolling view in the custom SwipeRefreshLayout.
         // swipeRefreshLayout.setScrollUpChild(listView);
         mToButton = (Button) root.findViewById(R.id.to_button);
-        mToButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), PictureDetailActivity.class);
-                intent.putExtra("strategy_index", 4);
-                startActivity(intent);
-            }
+        mToButton.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), PictureDetailActivity.class);
+            intent.putExtra("strategy_index", 4);
+            startActivity(intent);
         });
 
         mRecyclerView = (RecyclerView) root.findViewById(R.id.recycle_view);
@@ -126,12 +122,7 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
         mRecyclerView.setAdapter(mRecyclerAdapter);
         //设置增加或删除条目的动画
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mPresenter.loadPictures(false);
-            }
-        });
+        mRefreshLayout.setOnRefreshListener(() -> mPresenter.loadPictures(false));
 
         return root;
     }
@@ -171,20 +162,13 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
         if (getView() == null) {
             return;
         }
-        final SwipeRefreshLayout srl =
-                (SwipeRefreshLayout) getView().findViewById(R.id.refresh_layout);
 
         // Make sure setRefreshing() is called after the layout is done with everything else.
-        srl.post(new Runnable() {
-            @Override
-            public void run() {
-                srl.setRefreshing(active);
-            }
-        });
+        mRefreshLayout.post(() -> mRefreshLayout.setRefreshing(active));
     }
 
     @Override
-    public void showEmptyPictures(List<Picture> Pictures) {
+    public void showPictures(List<Picture> Pictures) {
         mRecyclerAdapter.replaceData(Pictures);
         mPicturesView.setVisibility(View.VISIBLE);
     }

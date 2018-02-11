@@ -4,6 +4,7 @@
     <string name="label_text">Android Image Test</string>
     <string name="no_progress">no progress</string>
     <string name="button_text_start">Start</string>
+    <string name="button_text_stop">Stop</string>
     <string name="button_text_save">Save</string>
     <string name="button_text_cut">Cut</string>
 

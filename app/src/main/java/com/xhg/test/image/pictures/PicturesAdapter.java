@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.xhg.test.image.R;
 import com.xhg.test.image.data.Picture;
@@ -19,7 +20,6 @@ import java.util.List;
  */
 
 public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.PicturesViewHolder> {
-
     private static final String TAG = "MainAdapter";
 
     private List<Picture> mPictures;
@@ -65,8 +65,7 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
 
     //填充onCreateViewHolder方法返回的holder中的控件
     @Override
-    public void onBindViewHolder(final PicturesViewHolder holder,
-                                 final int position) {
+    public void onBindViewHolder(final PicturesViewHolder holder, final int position) {
 //        final BitmapGenerator colorHolder = new BitmapGenerator(504, 504);
 //        colorHolder.setStrategy(mPictures.get(position).getStrategy());
 //        colorHolder.setCallback(new BitmapGenerator.SimpleCallback() {
@@ -75,22 +74,18 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
 //                holder.imageView.setImageBitmap(colorHolder.createBitmap());
 //            }
 //        }).startInParallel();
-        Log.e(TAG, "onBindViewHolder: position=" + position);
+        Log.v(TAG, "onBindViewHolder: position=" + position);
         Bitmap bitmap = mPictures.get(position).getBitmap();
         if (bitmap != null) {
-            Log.e(TAG, "onBindViewHolder: bitmap not null");
+            Log.v(TAG, "onBindViewHolder: bitmap not null");
             holder.imageView.setImageBitmap(bitmap);
         } else {
             holder.imageView.setImageResource(R.drawable.empty_image_150dp);
         }
-        holder.imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(mPictures.get(position));
-                }
-            }
-        });
+        holder.textView.setText(mPictures.get(position).getStrategy().getDescription());
+        holder.imageView.setOnClickListener(v ->
+                mOnItemClickListener.onItemClick(mPictures.get(position))
+        );
     }
 
     @Override
@@ -106,10 +101,12 @@ public class PicturesAdapter extends RecyclerView.Adapter<PicturesAdapter.Pictur
 
     static class PicturesViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
+        TextView textView;
 
         public PicturesViewHolder(View view) {
             super(view);
-            imageView = (ImageView) view.findViewById(R.id.image);
+            imageView = view.findViewById(R.id.image);
+            textView = view.findViewById(R.id.text_picture_description);
         }
     }
 }

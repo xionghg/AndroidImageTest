@@ -36,8 +36,8 @@ public class StrategyFactory {
     private void init() {
         mStrategies = new ColorStrategy[]{new RandomPainter(), new Mandelbrot2(), new Mandelbrot3()
                 , new TableCloths(), new Mandelbrot1(), new Mandelbrot1()
-                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot2()
-                , new Mandelbrot1(), new Mandelbrot2(), new Mandelbrot1()};
+                , new Mandelbrot2(), new Mandelbrot3(), new RandomPainter()
+                , new TableCloths()};
     }
 
     public ColorStrategy getStrategy(int index) {

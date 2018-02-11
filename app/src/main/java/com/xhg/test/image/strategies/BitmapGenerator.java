@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 位图生成器，根据颜色生成策略生成相应的位图，只供单次使用
+ * 位图生成器，根据颜色生成策略生成相应的位图，可重复使用
  *
  * @author xionghg
  * @created 2017-07-04.
@@ -31,6 +31,7 @@ public class BitmapGenerator {
     private int mWidth;
 
     private int mAlpha = OPAQUE;
+    private MyAsyncTask mMyAsyncTask;
     /**
      * 颜色生成策略
      */
@@ -45,6 +46,7 @@ public class BitmapGenerator {
      * 颜色数组，占用内存大，使用后回收
      */
     private int[] mColorArray;
+
     /**
      * 生成器状态
      */
@@ -58,13 +60,47 @@ public class BitmapGenerator {
         mStrategy = Objects.requireNonNull(builder.colorStrategy);
     }
 
-    private Bitmap createBitmap() {
-        if (mStatus != Status.FINISHED) {
-            return null;
+    public void cancel() {
+        if (mStatus != Status.RUNNING) {
+            Log.w(TAG, "cancel: not running, no need to cancel");
+            return;
         }
-        Bitmap bitmap = Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        Log.d(TAG, "cancel is called");
+        if (mMyAsyncTask != null) {
+            mMyAsyncTask.cancel(false);
+            mMyAsyncTask = null;
+        }
+        mCallback.onProgressUpdate(0);
+        mStrategy.recycle(); // release after finished
         mColorArray = null;
-        return bitmap;
+        mCallback.onCanceled();
+        mStatus = Status.PENDING;
+    }
+
+    // 开始并行执行
+    public void startInParallel() {
+        startGeneratePixel(true);
+    }
+
+    // 开始串行执行
+    public void startInSerial() {
+        startGeneratePixel(false);
+    }
+
+    private void startGeneratePixel(boolean inParallel) {
+        if (mStatus == Status.RUNNING) {
+            Log.w(TAG, "startGeneratePixel: is running now, return");
+            return;
+        }
+        Log.d(TAG, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
+        mStatus = Status.RUNNING;
+        // 开始之后才分配内存
+        mColorArray = new int[mWidth * mHeight];
+        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
+
+        mCallback.onStart();
+        mMyAsyncTask = new MyAsyncTask(inParallel, 0, mHeight);
+        mMyAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private void updateProgress(int progress) {
@@ -74,29 +110,10 @@ public class BitmapGenerator {
     private void generatePixelFinished() {
         Log.d(TAG, "generate pixel finished");
         mStatus = Status.FINISHED;
+        Bitmap bitmap = Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
         mStrategy.recycle(); // release after finished
-        mCallback.onBitmapCreated(createBitmap());
-    }
-
-    private void startGeneratePixel(boolean inParallel) {
-        Log.d(TAG, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
-        mStatus = Status.RUNNING;
-        // 开始之后才分配内存
-        mColorArray = new int[mWidth * mHeight];
-        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
-
-        mCallback.onStart();
-        new MyAsyncTask(inParallel, 0, mHeight).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    // 开始并行执行
-    public void startInParallel() {
-        startGeneratePixel(mHeight > 300 || mColorArray.length > 100000);
-    }
-
-    // 开始串行执行
-    public void startInSerial() {
-        startGeneratePixel(false);
+        mColorArray = null;
+        mCallback.onBitmapCreated(bitmap);
     }
 
     // 检查数据是否合理，闭区间
@@ -108,6 +125,7 @@ public class BitmapGenerator {
         return number;
     }
 
+    // get and set begin
     public String getName() {
         return mName;
     }
@@ -151,6 +169,10 @@ public class BitmapGenerator {
     public void setAlpha(int alpha) {
         mAlpha = checkNumber(alpha, 1, 255) << 24;
     }
+
+    public Status getStatus() {
+        return mStatus;
+    }
     // get and set end
 
     /**
@@ -163,17 +185,20 @@ public class BitmapGenerator {
     /**
      * 直接使用ColorGenerator，则使用此回调
      */
+    @FunctionalInterface
     public interface Callback {
         /**
          * Called before generate colors, add this interface because we always want to do the
          * same things before startGeneratePixel generate colors, like set Button to disable.
          */
-        void onStart();
+        default void onStart() {
+        }
 
         /**
          * Called when progress updated..
          */
-        void onProgressUpdate(int progress);
+        default void onProgressUpdate(int progress) {
+        }
 
         /**
          * Called when colors has been created.
@@ -183,27 +208,7 @@ public class BitmapGenerator {
         /**
          * Called when errors happened.
          */
-        void onError(String errorMsg);
-    }
-
-    /**
-     * An implementation of {@link BitmapGenerator.Callback} that has empty method bodies and
-     * default return values.
-     */
-    public static abstract class SimpleCallback implements Callback {
-        @Override
-        public void onStart() {
-        }
-
-        @Override
-        public void onProgressUpdate(int progress) {
-        }
-
-        @Override
-        public abstract void onBitmapCreated(Bitmap bitmap);
-
-        @Override
-        public void onError(String errorMsg) {
+        default void onCanceled() {
         }
     }
 
@@ -273,7 +278,7 @@ public class BitmapGenerator {
 
         @Override
         protected Boolean doInBackground(Integer... params) {
-            Log.d(TAG, mName + " doInBackground");
+            Log.d(TAG, mName + " doInBackground begin");
             // 单线程7.869s; 2线程4.001s; 3线程4.294s  3664 4405 4815;
             // 6线程1.773s  1761 1871 1688; 7线程1.763s
 
@@ -288,12 +293,16 @@ public class BitmapGenerator {
             } else {
                 points.forEach(this::getPixelOnPoint);
             }
+
+            Log.d(TAG, mName + " doInBackground end");
             return true;
         }
 
         private void getPixelOnPoint(Point p) {
-            int rgb = mStrategy.getRGB(p.x, p.y);
-            mColorArray[p.y * mWidth + p.x] = mAlpha | rgb;
+            if (isCancelled()) {
+                return;
+            }
+            mColorArray[p.y * mWidth + p.x] = mStrategy.getRGB(p.x, p.y);
 
             int currentProgress = mCurrentPoint.incrementAndGet() * 100 / mTotalPoint;
             if (mTotalPoint <= 100) {
@@ -313,7 +322,6 @@ public class BitmapGenerator {
 
         @Override
         protected void onPostExecute(Boolean success) {
-            Log.d(TAG, mName + " onPostExecute");
             generatePixelFinished();
         }
     }

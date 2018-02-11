@@ -11,6 +11,7 @@ import com.xhg.test.image.R;
 import com.xhg.test.image.imageloader.ImageResizer;
 
 public class PictureCutActivity extends AppCompatActivity {
+    private static final String TAG = "PictureCutActivity";
 
     ImageView mOriginPic;
     ImageView mSmallPic;
@@ -30,10 +31,9 @@ public class PictureCutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_picture_cut);
         String path = getIntent().getStringExtra("pic_path");
         initViews();
-        Bitmap bitmap = new ImageResizer().decodeSampledBitmapFromPath(path, 200, 200);
+        Bitmap bitmap = new ImageResizer().decodeSampledBitmapFromPath(path, 400, 400);
         mOriginPic.setImageBitmap(bitmap);
     }
-
 
     private void initViews() {
         mOriginPic = findViewById(R.id.origin_pic);

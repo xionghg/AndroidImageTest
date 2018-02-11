@@ -10,7 +10,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -27,11 +26,12 @@ import com.xhg.test.image.utils.Log;
 import java.util.Locale;
 
 public class PictureDetailActivity extends AppCompatActivity {
-    private static final String TAG = "TestBitmap-BigImage";
+    private static final String TAG = "PictureDetailActivity";
     public static final String EXTRA_PICTURE_ID = "extra_picture_id";
     private BitmapGenerator mGenerator;
     private ImageView mImageView;
     private ProgressBar mProgressBar;
+    private TextView mHeadText;
     private TextView mProgressTextView;
     private Button mStartButton;
     private Button mSaveButton;
@@ -53,10 +53,10 @@ public class PictureDetailActivity extends AppCompatActivity {
         int index = getIntent().getIntExtra(EXTRA_PICTURE_ID, 0);
         mStrategyModel = StrategyFactory.getInstance();
         mStrategy = mStrategyModel.getStrategy(index);
-        BitmapGenerator.Callback callback = new BitmapGenerator.SimpleCallback() {
+        BitmapGenerator.Callback callback = new BitmapGenerator.Callback() {
             @Override
             public void onStart() {
-                mStartButton.setEnabled(false);
+                mStartButton.setText(R.string.button_text_stop);
                 mSaveButton.setEnabled(false);
                 mProgressBar.setProgress(0);
                 mProgressTextView.setText(R.string.no_progress);
@@ -70,14 +70,21 @@ public class PictureDetailActivity extends AppCompatActivity {
 
             @Override
             public void onBitmapCreated(Bitmap bitmap) {
-                Log.d(TAG, "ColorHolder: set color end");
+                Log.d(TAG, "onBitmapCreated");
                 mBitmap = bitmap;
                 mImageView.setImageBitmap(bitmap);
-                mStartButton.setEnabled(true);
+                mStartButton.setText(R.string.button_text_start);
                 mSaveButton.setEnabled(true);
             }
+
+            @Override
+            public void onCanceled() {
+                Log.d(TAG, "onCanceled: ");
+                mStartButton.setText(R.string.button_text_start);
+            }
         };
-        mGenerator = new BitmapGenerator.Builder(callback)
+        mGenerator = new BitmapGenerator.Builder()
+                .setCallBack(callback)
                 .setColorStrategy(mStrategy)
                 .build();
     }
@@ -101,20 +108,21 @@ public class PictureDetailActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         mProgressTextView = (TextView) findViewById(R.id.progress_text);
         mStartButton = (Button) findViewById(R.id.start_button);
-        mStartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mGenerator.startInParallel();
-            }
-        });
         mSaveButton = (Button) findViewById(R.id.save_button);
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkPermissionAndSave();
-            }
-        });
         mCutButton = (Button) findViewById(R.id.cut_button);
+        mHeadText = findViewById(R.id.head_text);
+
+        mStartButton.setOnClickListener(v -> onStartButtonClick());
+        mSaveButton.setOnClickListener(v -> checkPermissionAndSave());
+        mHeadText.setText(mStrategy.getDescription());
+    }
+
+    private void onStartButtonClick() {
+        if (mStartButton.getText().equals(getString(R.string.button_text_start))) {
+            mGenerator.startInParallel();
+        } else {
+            mGenerator.cancel();
+        }
     }
 
     private void savePicture() {
@@ -124,13 +132,10 @@ public class PictureDetailActivity extends AppCompatActivity {
 
             final String picPath = path;
             mCutButton.setEnabled(true);
-            mCutButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(PictureDetailActivity.this, PictureCutActivity.class);
-                    intent.putExtra("pic_path", picPath);
-                    startActivity(intent);
-                }
+            mCutButton.setOnClickListener(v -> {
+                Intent intent = new Intent(PictureDetailActivity.this, PictureCutActivity.class);
+                intent.putExtra("pic_path", picPath);
+                startActivity(intent);
             });
         }
     }

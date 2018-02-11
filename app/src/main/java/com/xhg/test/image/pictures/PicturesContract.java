@@ -19,7 +19,7 @@ public interface PicturesContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showEmptyPictures(List<Picture> pictures);
+        void showPictures(List<Picture> pictures);
 
         void showPictureUpdate(int index, Picture picture);
 
@@ -39,5 +39,7 @@ public interface PicturesContract {
         void openPictureDetails(@NonNull Picture requestedPicture);
 
         void registerRepositoryCallBack(boolean isRegister);
+
+        void cancelCurrentOperation();
     }
 }

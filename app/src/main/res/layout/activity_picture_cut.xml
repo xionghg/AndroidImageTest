@@ -16,8 +16,8 @@
 
     <ImageView
         android:id="@+id/origin_pic"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_below="@id/head_text"
         android:background="#50654321"/>
 

@@ -1,6 +1,5 @@
 package com.xhg.test.image.pictures;
 
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import com.xhg.test.image.data.Picture;
@@ -29,6 +28,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
     private final PicturesContract.View mPicturesView;
 
     private List<Picture> mCurrentPictures;
+    private List<BitmapGenerator> mBitmapGenerators = new ArrayList<>();
 
     private boolean mFirstLoad;
 
@@ -49,44 +49,56 @@ public class PicturesPresenter implements PicturesContract.Presenter,
             Picture pic = new Picture(n++, strategy);
             mCurrentPictures.add(pic);
         }
-        mPicturesView.showEmptyPictures(mCurrentPictures);
+        mPicturesView.showPictures(mCurrentPictures);
 
         startGenerateColor();
     }
 
     private void startGenerateColor() {
-        for (int i = 0; i < 2/*mCurrentPictures.size()*/; i++) {
-            final int index = i;
-            BitmapGenerator.Callback callback = new BitmapGenerator.SimpleCallback() {
-                @Override
-                public void onBitmapCreated(Bitmap bitmap) {
-                    mCurrentPictures.get(index).setBitmap(bitmap);
-                    mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
-                }
-            };
-            Log.e(TAG, "start generator" + i);
-            new BitmapGenerator.Builder(callback)
-                    .setWidth(512)
-                    .setHeight(512)
-                    .setColorStrategy(mCurrentPictures.get(index).getStrategy())
-                    .build()
-                    .startInParallel();
+        if (mBitmapGenerators.isEmpty()) {
+            for (int i = 0; i < 5/*mCurrentPictures.size()*/; i++) {
+                final int index = i;
+                Log.e(TAG, "start generator" + i);
+                BitmapGenerator generator = new BitmapGenerator.Builder()
+                        .setCallBack(bitmap -> {
+                            mCurrentPictures.get(index).setBitmap(bitmap);
+                            mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
+                        })
+                        .setWidth(256)
+                        .setHeight(256)
+                        .setColorStrategy(mCurrentPictures.get(index).getStrategy())
+                        .build();
+
+                mBitmapGenerators.add(generator);
+            }
+        }
+
+        for (BitmapGenerator generator : mBitmapGenerators) {
+            generator.startInParallel();
+        }
+    }
+
+    @Override
+    public void cancelCurrentOperation() {
+        Log.d(TAG, "cancelCurrentOperation: ");
+        for (BitmapGenerator generator : mBitmapGenerators) {
+            generator.cancel();
         }
     }
 
     @Override
     public void result(int requestCode, int resultCode) {
-
     }
 
     private void showFilteredPictures() {
-        List<Picture> PicturesToDisplay = new ArrayList<>();
+        List<Picture> picturesToDisplay = new ArrayList<>();
         if (mCurrentPictures != null) {
             for (Picture Picture : mCurrentPictures) {
-                PicturesToDisplay.add(Picture);
+                // TODO: add some filters
+                picturesToDisplay.add(Picture);
             }
         }
-        processPictures(PicturesToDisplay);
+        processPictures(picturesToDisplay);
     }
 
     public void loadPictures(boolean forceUpdate) {
@@ -95,6 +107,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
             mPicturesRepository.refreshPictures();
         } else {
             showFilteredPictures();
+            mPicturesView.setLoadingIndicator(false);
         }
     }
 
@@ -107,13 +120,13 @@ public class PicturesPresenter implements PicturesContract.Presenter,
         }
     }
 
-    private void processPictures(List<Picture> Pictures) {
-        if (Pictures.isEmpty()) {
-            // Show a message indicating there are no Pictures.
+    private void processPictures(List<Picture> pictures) {
+        if (pictures.isEmpty()) {
+            // Show a message indicating there are no pictures.
             processEmptyPictures();
         } else {
-            // Show the list of Pictures
-            mPicturesView.showEmptyPictures(Pictures);
+            // Show the list of pictures
+            mPicturesView.showPictures(pictures);
         }
     }
 
