@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * 位图生成器，根据颜色生成策略生成相应的位图，可重复使用
  *
@@ -19,10 +24,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    public static final boolean USE_RX_PARALLEL = false;
     private static final String TAG = "BitmapGenerator";
     private static final AtomicInteger sIndex = new AtomicInteger(0);
     private final AtomicInteger mCurrentPoint = new AtomicInteger(0);
     private MyAsyncTask mMyAsyncTask;
+    private Disposable mDisposable;
     /**
      * 颜色数组，占用内存大，使用后回收
      */
@@ -59,6 +66,12 @@ public class BitmapGenerator {
             mMyAsyncTask.cancel(false);
             mMyAsyncTask = null;
         }
+        if (mDisposable != null) {
+            if (!mDisposable.isDisposed()) {
+                mDisposable.dispose();
+            }
+            mDisposable = null;
+        }
         p.getCallback().onProgressUpdate(0);
         p.getStrategy().recycle(); // release after finished
         mColorArray = null;
@@ -86,23 +99,36 @@ public class BitmapGenerator {
         mStatus = Status.RUNNING;
         // 开始之后才分配内存
         mColorArray = new int[p.getTotal()];
-
         p.getCallback().onStart();
-        mMyAsyncTask = new MyAsyncTask(inParallel, 0, p.getHeight());
-        mMyAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         // TODO: 使用rxjava，但效率貌似不高
-//        mCurrentPoint.set(0);
-//        Flowable.range(0, total)
-//                .parallel()
-//                .runOn(Schedulers.computation())
-//                .map(this::getPixelOnPosition)
-//                .filter(progress -> progress > 0)
-//                .sequential()
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(this::updateProgress,
-//                        e -> Log.e(TAG, "startGeneratePixel: ", e),
-//                        this::generatePixelFinished);
+        mCurrentPoint.set(0);
+        if (inParallel) {
+            if (USE_RX_PARALLEL) {
+                mDisposable = Flowable.range(0, p.getTotal())
+                        .parallel()
+                        .runOn(Schedulers.computation())
+                        .map(this::getPixelOnPosition)
+                        .filter(progress -> progress > 0)
+                        .sequential()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(this::updateProgress,
+                                e -> Log.e(TAG, "startGeneratePixel: ", e),
+                                this::generatePixelFinished);
+            } else {
+                mMyAsyncTask = new MyAsyncTask(inParallel, 0, p.getHeight());
+                mMyAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
+        } else {
+            mDisposable = Flowable.range(0, p.getTotal())
+                    .map(this::getPixelOnPosition)
+                    .filter(progress -> progress > 0)
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(this::updateProgress,
+                            e -> Log.e(TAG, "startGeneratePixel: ", e),
+                            this::generatePixelFinished);
+        }
     }
 
     // return progress, -1 if not yet
@@ -134,6 +160,8 @@ public class BitmapGenerator {
         Bitmap bitmap = Bitmap.createBitmap(mColorArray, p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
         p.getStrategy().recycle(); // release after finished
         mColorArray = null;
+        mMyAsyncTask = null;
+        mDisposable = null;
         p.getCallback().onBitmapCreated(bitmap);
     }
 
@@ -144,9 +172,6 @@ public class BitmapGenerator {
         PENDING, RUNNING, FINISHED
     }
 
-    /**
-     * 直接使用ColorGenerator，则使用此回调
-     */
     @FunctionalInterface
     public interface Callback {
         /**
@@ -156,20 +181,11 @@ public class BitmapGenerator {
         default void onStart() {
         }
 
-        /**
-         * Called when progress updated..
-         */
         default void onProgressUpdate(int progress) {
         }
 
-        /**
-         * Called when colors has been created.
-         */
         void onBitmapCreated(Bitmap bitmap);
 
-        /**
-         * Called when errors happened.
-         */
         default void onCanceled() {
         }
     }
@@ -185,7 +201,6 @@ public class BitmapGenerator {
     }
 
     private class MyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
-        final AtomicInteger mCurrentPoint = new AtomicInteger(0);
         String mName = "AsyncTask";
         boolean mInParallel;
         int mStartHeight;
