@@ -2,8 +2,6 @@ package com.xhg.test.image.strategies;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
 
 import com.xhg.test.image.utils.Log;
 
@@ -22,42 +20,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final String TAG = "BitmapGenerator";
-    private static final int OPAQUE = 0xff000000;  // 完全不透明
-
-    private String mName;
-    @IntRange(from = 1, to = 10000)
-    private int mHeight;
-    @IntRange(from = 1, to = 10000)
-    private int mWidth;
-
-    private int mAlpha = OPAQUE;
+    private static final AtomicInteger sIndex = new AtomicInteger(0);
+    private final AtomicInteger mCurrentPoint = new AtomicInteger(0);
     private MyAsyncTask mMyAsyncTask;
-    /**
-     * 颜色生成策略
-     */
-    @NonNull
-    private ColorStrategy mStrategy;
-    /**
-     * 回调
-     */
-    @NonNull
-    private Callback mCallback;
     /**
      * 颜色数组，占用内存大，使用后回收
      */
     private int[] mColorArray;
-
     /**
      * 生成器状态
      */
     private volatile Status mStatus = Status.PENDING;
+    private GeneratorParameter p;
 
-    private BitmapGenerator(Builder builder) {
-        mName = builder.name;
-        mCallback = Objects.requireNonNull(builder.callback);
-        setWidth(builder.width);
-        setHeight(builder.height);
-        mStrategy = Objects.requireNonNull(builder.colorStrategy);
+    private BitmapGenerator(GeneratorParameter parameter) {
+        setParameter(parameter);
+    }
+
+    public static BitmapGenerator with(GeneratorParameter parameter) {
+        return new BitmapGenerator(parameter);
+    }
+
+    public GeneratorParameter getParameter() {
+        return p;
+    }
+
+    public void setParameter(GeneratorParameter parameter) {
+        p = Objects.requireNonNull(parameter, "parameter can't be null");
     }
 
     public void cancel() {
@@ -70,10 +59,10 @@ public class BitmapGenerator {
             mMyAsyncTask.cancel(false);
             mMyAsyncTask = null;
         }
-        mCallback.onProgressUpdate(0);
-        mStrategy.recycle(); // release after finished
+        p.getCallback().onProgressUpdate(0);
+        p.getStrategy().recycle(); // release after finished
         mColorArray = null;
-        mCallback.onCanceled();
+        p.getCallback().onCanceled();
         mStatus = Status.PENDING;
     }
 
@@ -93,87 +82,60 @@ public class BitmapGenerator {
             return;
         }
         Log.d(TAG, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
+        p.checkParameter();
         mStatus = Status.RUNNING;
         // 开始之后才分配内存
-        mColorArray = new int[mWidth * mHeight];
-        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
+        mColorArray = new int[p.getTotal()];
 
-        mCallback.onStart();
-        mMyAsyncTask = new MyAsyncTask(inParallel, 0, mHeight);
+        p.getCallback().onStart();
+        mMyAsyncTask = new MyAsyncTask(inParallel, 0, p.getHeight());
         mMyAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        // TODO: 使用rxjava，但效率貌似不高
+//        mCurrentPoint.set(0);
+//        Flowable.range(0, total)
+//                .parallel()
+//                .runOn(Schedulers.computation())
+//                .map(this::getPixelOnPosition)
+//                .filter(progress -> progress > 0)
+//                .sequential()
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(this::updateProgress,
+//                        e -> Log.e(TAG, "startGeneratePixel: ", e),
+//                        this::generatePixelFinished);
+    }
+
+    // return progress, -1 if not yet
+    private int getPixelOnPosition(int pos) {
+        final int x = pos % p.getWidth();
+        final int y = pos / p.getWidth();
+        // mColorArray[p.y * p.getWidth() + p.x] = mStrategy.getRGB(p.x, p.y);
+        mColorArray[pos] = p.getStrategy().getRGB(x, y);
+
+        final int pre = mCurrentPoint.getAndIncrement();
+        final int now = pre + 1;
+        int preProgress = pre * 100 / p.getTotal();
+        int nowProgress = now * 100 / p.getTotal();
+        if (nowProgress > preProgress) {
+            Log.d(TAG, "getPixelOnPosition: progress=" + nowProgress);
+            return nowProgress;
+        }
+        return -1;
     }
 
     private void updateProgress(int progress) {
-        mCallback.onProgressUpdate(progress);
+        Log.d(TAG, "updateProgress: " + progress);
+        p.getCallback().onProgressUpdate(progress);
     }
 
     private void generatePixelFinished() {
         Log.d(TAG, "generate pixel finished");
         mStatus = Status.FINISHED;
-        Bitmap bitmap = Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
-        mStrategy.recycle(); // release after finished
+        Bitmap bitmap = Bitmap.createBitmap(mColorArray, p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
+        p.getStrategy().recycle(); // release after finished
         mColorArray = null;
-        mCallback.onBitmapCreated(bitmap);
+        p.getCallback().onBitmapCreated(bitmap);
     }
-
-    // 检查数据是否合理，闭区间
-    private static int checkNumber(int number, int left, int right) {
-        if (number < left || number > right) {
-            throw new IllegalArgumentException("params not right, should between " + left +
-                    " and " + right + ", actually is " + number);
-        }
-        return number;
-    }
-
-    // get and set begin
-    public String getName() {
-        return mName;
-    }
-
-    public void setName(String name) {
-        mName = name;
-    }
-
-    public int getHeight() {
-        return mHeight;
-    }
-
-    public void setHeight(int height) {
-        mHeight = checkNumber(height, 1, 10000);
-    }
-
-    public int getWidth() {
-        return mWidth;
-    }
-
-    public void setWidth(int width) {
-        mWidth = checkNumber(width, 1, 10000);
-    }
-
-    public ColorStrategy getStrategy() {
-        return mStrategy;
-    }
-
-    public void setStrategy(ColorStrategy strategy) {
-        mStrategy = strategy;
-    }
-
-    public Callback getCallback() {
-        return mCallback;
-    }
-
-    public void setCallback(Callback callback) {
-        mCallback = Objects.requireNonNull(callback);
-    }
-
-    public void setAlpha(int alpha) {
-        mAlpha = checkNumber(alpha, 1, 255) << 24;
-    }
-
-    public Status getStatus() {
-        return mStatus;
-    }
-    // get and set end
 
     /**
      * Indicates the current status of the generator.
@@ -212,67 +174,31 @@ public class BitmapGenerator {
         }
     }
 
-    public static class Builder {
-        private int width = 1024;
-        private int height = 1024;
-        private String name = null;
-        private ColorStrategy colorStrategy;
-        private Callback callback;
+    static class Point {
+        int x;
+        int y;
 
-        public Builder() {
-        }
-
-        public Builder setCallBack(Callback callback) {
-            this.callback = callback;
-            return this;
-        }
-
-        public Builder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public Builder setWidth(int width) {
-            this.width = width;
-            return this;
-        }
-
-        public Builder setHeight(int height) {
-            this.height = height;
-            return this;
-        }
-
-        public Builder setColorStrategy(ColorStrategy colorStrategy) {
-            this.colorStrategy = colorStrategy;
-            return this;
-        }
-
-        public BitmapGenerator build() { // 构建，返回一个新对象
-            return new BitmapGenerator(this);
-        }
-
-        public void start() { // 构建，返回一个新对象
-            build().startInParallel();
+        Point(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
     }
 
-    private static final AtomicInteger sIndex = new AtomicInteger(0);
-
     private class MyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
+        final AtomicInteger mCurrentPoint = new AtomicInteger(0);
         String mName = "AsyncTask";
         boolean mInParallel;
         int mStartHeight;
         int mEndHeight;
         int mTotalPoint;
         int mLastProgress = 0;
-        final AtomicInteger mCurrentPoint = new AtomicInteger(0);
 
         public MyAsyncTask(boolean inParallel, int start, int end) {
             super();
             mInParallel = inParallel;
             mStartHeight = start;
             mEndHeight = end;
-            mTotalPoint = (end - start) * mWidth;
+            mTotalPoint = (end - start) * p.getWidth();
             mName = "MyAsyncTask@" + sIndex.incrementAndGet() + "-" + (inParallel ? "1" : "0");
         }
 
@@ -284,7 +210,7 @@ public class BitmapGenerator {
 
             List<Point> points = new ArrayList<>(mTotalPoint);
             for (int y = mStartHeight; y < mEndHeight; y++) {
-                for (int x = 0; x < mWidth; x++) {
+                for (int x = 0; x < p.getWidth(); x++) {
                     points.add(new Point(x, y));
                 }
             }
@@ -298,11 +224,11 @@ public class BitmapGenerator {
             return true;
         }
 
-        private void getPixelOnPoint(Point p) {
+        private void getPixelOnPoint(Point point) {
             if (isCancelled()) {
                 return;
             }
-            mColorArray[p.y * mWidth + p.x] = mStrategy.getRGB(p.x, p.y);
+            mColorArray[point.y * p.getWidth() + point.x] = p.getStrategy().getRGB(point.x, point.y);
 
             int currentProgress = mCurrentPoint.incrementAndGet() * 100 / mTotalPoint;
             if (mTotalPoint <= 100) {
@@ -323,16 +249,6 @@ public class BitmapGenerator {
         @Override
         protected void onPostExecute(Boolean success) {
             generatePixelFinished();
-        }
-    }
-
-    static class Point {
-        int x;
-        int y;
-
-        Point(int x, int y) {
-            this.x = x;
-            this.y = y;
         }
     }
 }

@@ -7,6 +7,7 @@ import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.data.source.PicturesRepository;
 import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
+import com.xhg.test.image.strategies.GeneratorParameter;
 import com.xhg.test.image.utils.Log;
 
 import java.util.ArrayList;
@@ -51,24 +52,22 @@ public class PicturesPresenter implements PicturesContract.Presenter,
         }
         mPicturesView.showPictures(mCurrentPictures);
 
-        startGenerateColor();
+        //startGenerateColor();
     }
 
-    private void startGenerateColor() {
+    public void startGenerateColor() {
         if (mBitmapGenerators.isEmpty()) {
-            for (int i = 0; i < 5/*mCurrentPictures.size()*/; i++) {
+            for (int i = 0; i < 1/*mCurrentPictures.size()*/; i++) {
                 final int index = i;
                 Log.e(TAG, "start generator" + i);
-                BitmapGenerator generator = new BitmapGenerator.Builder()
-                        .setCallBack(bitmap -> {
+                BitmapGenerator generator = BitmapGenerator.with(new GeneratorParameter()
+                        .setCallback(bitmap -> {
                             mCurrentPictures.get(index).setBitmap(bitmap);
                             mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
                         })
                         .setWidth(256)
                         .setHeight(256)
-                        .setColorStrategy(mCurrentPictures.get(index).getStrategy())
-                        .build();
-
+                        .setStrategy(mCurrentPictures.get(index).getStrategy()));
                 mBitmapGenerators.add(generator);
             }
         }

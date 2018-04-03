@@ -41,5 +41,7 @@ public interface PicturesContract {
         void registerRepositoryCallBack(boolean isRegister);
 
         void cancelCurrentOperation();
+
+        void startGenerateColor();
     }
 }

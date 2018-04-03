@@ -109,9 +109,10 @@ public class PicturesFragment extends Fragment implements PicturesContract.View 
         // swipeRefreshLayout.setScrollUpChild(listView);
         mToButton = (Button) root.findViewById(R.id.to_button);
         mToButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), PictureDetailActivity.class);
-            intent.putExtra("strategy_index", 4);
-            startActivity(intent);
+//            Intent intent = new Intent(getActivity(), PictureDetailActivity.class);
+//            intent.putExtra("strategy_index", 4);
+//            startActivity(intent);
+            mPresenter.startGenerateColor();
         });
 
         mRecyclerView = (RecyclerView) root.findViewById(R.id.recycle_view);
