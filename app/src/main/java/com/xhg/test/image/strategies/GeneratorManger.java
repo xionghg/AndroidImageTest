@@ -57,7 +57,7 @@ public class GeneratorManger {
     public void start() {
         for (BitmapGenerator generator : mWorkingGenerators) {
             if (mWorkingGenerators.size() > BitmapGenerator.CPU_COUNT) {
-                generator.startInSerial();
+                generator.startInSequential();
             } else {
                 generator.startInParallel();
             }

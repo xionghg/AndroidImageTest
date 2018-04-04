@@ -22,52 +22,95 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
-    private static final String TAG = "BitmapGenerator";
+    private static final AtomicInteger sIndex = new AtomicInteger(0);
     private final AtomicInteger mCurrentPoint = new AtomicInteger(0);
-    private Disposable mDisposable;
-    /**
-     * 颜色数组，占用内存大，使用后回收
-     */
-    private int[] mColorArray;
-    /**
-     * 生成器状态
-     */
+    private String mTag;
     private volatile Status mStatus = Status.PENDING;
-    private GeneratorParameter p;
-    private long startTime;
+    private long mStartTime;
+    private Disposable mDisposable;
 
-    private BitmapGenerator(GeneratorParameter parameter) {
-        setParameter(parameter);
+    private int mAlpha = 0xff000000;  // 不透明度，默认完全不透明
+    private int mHeight = 1024;       // 高，默认1024
+    private int mWidth = 1024;        // 宽，默认1024
+    private ColorStrategy mStrategy;  // 颜色策略，不设置则使用默认全黑策略
+    private int[] mColorArray;        // 颜色数组，占用内存大，使用后回收
+    // 回调，不可为空
+    private Callback mCallback;
+
+    private BitmapGenerator(Callback callback) {
+        mTag = "BitmapGenerator-" + sIndex.getAndIncrement();
+        setCallback(callback);
     }
 
-    public static BitmapGenerator with(GeneratorParameter parameter) {
-        return new BitmapGenerator(parameter);
+    public static BitmapGenerator with(Callback callback) {
+        return new BitmapGenerator(callback);
     }
 
-    public GeneratorParameter getParameter() {
-        return p;
+    public void checkParameter() {
+        final int total = mWidth * mHeight;
+        checkNumber(total, 1, Integer.MAX_VALUE);
+        Objects.requireNonNull(mCallback);
+        if (mStrategy == null) {
+            mStrategy = new DefaultStrategy();
+        }
+        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
     }
 
-    public void setParameter(GeneratorParameter parameter) {
-        p = Objects.requireNonNull(parameter, "parameter can't be null");
+    // get and set begin
+    public int getHeight() {
+        return mHeight;
     }
+
+    public BitmapGenerator setHeight(int height) {
+        mHeight = checkNumber(height, 1, 10000);
+        return this;
+    }
+
+    public int getWidth() {
+        return mWidth;
+    }
+
+    public BitmapGenerator setWidth(int width) {
+        mWidth = checkNumber(width, 1, 10000);
+        return this;
+    }
+
+    public ColorStrategy getStrategy() {
+        return mStrategy;
+    }
+
+    public BitmapGenerator setStrategy(ColorStrategy strategy) {
+        mStrategy = strategy;
+        return this;
+    }
+
+    public Callback getCallback() {
+        return mCallback;
+    }
+
+    public BitmapGenerator setCallback(Callback callback) {
+        mCallback = Objects.requireNonNull(callback);
+        return this;
+    }
+
+    public BitmapGenerator setAlpha(int alpha) {
+        mAlpha = checkNumber(alpha, 1, 255) << 24;
+        return this;
+    }
+    // get and set end
 
     public void cancel() {
         if (mStatus != Status.RUNNING) {
-            Log.w(TAG, "cancel: not running, no need to cancel");
+            Log.w(mTag, "cancel: not running, no need to cancel");
             return;
         }
-        Log.d(TAG, "cancel is called");
-        if (mDisposable != null) {
-            if (!mDisposable.isDisposed()) {
-                mDisposable.dispose();
-            }
-            mDisposable = null;
+        Log.d(mTag, "cancel is called");
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
         }
-        p.getCallback().onProgressUpdate(0);
-        p.getStrategy().recycle(); // release after finished
-        mColorArray = null;
-        p.getCallback().onCanceled();
+        mCallback.onProgressUpdate(0);
+        mCallback.onCanceled();
+        softReset();
         mStatus = Status.PENDING;
     }
 
@@ -77,84 +120,95 @@ public class BitmapGenerator {
     }
 
     // 开始串行执行
-    public void startInSerial() {
+    public void startInSequential() {
         startGeneratePixel(false);
     }
 
     private void startGeneratePixel(boolean inParallel) {
         if (mStatus == Status.RUNNING) {
-            Log.w(TAG, "startGeneratePixel: is running now, return");
+            Log.w(mTag, "startGeneratePixel: is running now, return");
             return;
         }
-        Log.d(TAG, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
-        p.checkParameter();
         mStatus = Status.RUNNING;
-        // 开始之后才分配内存
-        mColorArray = new int[p.getTotal()];
-        p.getCallback().onStart();
+        Log.d(mTag, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
+        checkParameter();
+        mColorArray = new int[mWidth * mHeight];        // 开始之后才分配内存
+        mCallback.onStart();
 
-        startTime = System.currentTimeMillis();
+        mStartTime = System.currentTimeMillis();
         mCurrentPoint.set(0);
+        Flowable<Integer> flowable;
         if (inParallel) {
-            ParallelFlowable<Integer> pFlowable = ParallelFlowable.from(Flowable.range(0, p.getHeight()), 2);
-            mDisposable = pFlowable
+            flowable = ParallelFlowable.from(Flowable.range(0, mHeight), 2)
                     .runOn(Schedulers.computation())
                     .map(this::getPixelOnLine)
                     .filter(progress -> progress > 0)
-                    .sequential()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::updateProgress,
-                            e -> Log.e(TAG, "startGeneratePixel: ", e),
-                            this::generatePixelFinished);
+                    .sequential();
         } else {
-            mDisposable = Flowable.range(0, p.getHeight())
+            flowable = Flowable.range(0, mHeight)
                     .map(this::getPixelOnLine)
                     .filter(progress -> progress > 0)
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(this::updateProgress,
-                            e -> Log.e(TAG, "startGeneratePixel: ", e),
-                            this::generatePixelFinished);
+                    .subscribeOn(Schedulers.computation());
         }
+        mDisposable = flowable
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::updateProgress,
+                        this::handleError,
+                        this::generatePixelFinished);
     }
 
     // return progress, -1 if not yet
     private int getPixelOnLine(int line) {
-        for (int i = 0; i < p.getWidth(); i++) {
-            mColorArray[line * p.getWidth() + i] = p.getStrategy().getRGB(i, line);
+        for (int i = 0; i < mWidth; i++) {
+            mColorArray[line * mWidth + i] = mStrategy.getRGB(i, line);
         }
-
         final int pre = mCurrentPoint.getAndIncrement();
-        final int now = pre + 1;
-        int preProgress = pre * 100 / p.getHeight();
-        int nowProgress = now * 100 / p.getHeight();
+        int preProgress = pre * 100 / mHeight;
+        int nowProgress = (pre + 1) * 100 / mHeight;
         if (nowProgress > preProgress) {
-            Log.d(TAG, "getPixelOnLine: progress=" + nowProgress);
+            Log.d(mTag, "getPixelOnLine: new progress=" + nowProgress);
             return nowProgress;
         }
         return -1;
     }
 
     private void updateProgress(int progress) {
-        Log.d(TAG, "updateProgress: " + progress);
-        p.getCallback().onProgressUpdate(progress);
+        Log.d(mTag, "updateProgress: " + progress);
+        mCallback.onProgressUpdate(progress);
+    }
+
+    private void handleError(Throwable e) {
+        Log.e(mTag, "error happened when generate color: ", e);
     }
 
     private void generatePixelFinished() {
-        long cost = System.currentTimeMillis() - startTime;
-        Log.d(TAG, "generate pixel finished, cost: " + cost + "ms");
+        long cost = System.currentTimeMillis() - mStartTime;
+        Log.d(mTag, "generate pixel finished, cost: " + cost + "ms");
+        Bitmap bitmap = Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        mCallback.onBitmapCreated(bitmap);
+        softReset();
         mStatus = Status.FINISHED;
-        Bitmap bitmap = Bitmap.createBitmap(mColorArray, p.getWidth(), p.getHeight(), Bitmap.Config.ARGB_8888);
-        p.getStrategy().recycle(); // release after finished
+    }
+
+    private void softReset() {
+        mStrategy.recycle(); // release after finished
         mColorArray = null;
         mDisposable = null;
-        p.getCallback().onBitmapCreated(bitmap);
+    }
+
+    // 检查数据是否合理，闭区间
+    private int checkNumber(int number, int left, int right) {
+        if (number < left || number > right) {
+            throw new IllegalArgumentException("params not right, should between " + left +
+                    " and " + right + ", actually is " + number);
+        }
+        return number;
     }
 
     /**
      * Indicates the current status of the generator.
      */
-    public enum Status {
+    private enum Status {
         PENDING, RUNNING, FINISHED
     }
 
@@ -173,6 +227,14 @@ public class BitmapGenerator {
         void onBitmapCreated(Bitmap bitmap);
 
         default void onCanceled() {
+        }
+    }
+
+    // A default strategy that return black color for all
+    private static class DefaultStrategy extends CombinedRGBColorStrategy {
+        @Override
+        public int getRGB(int x, int y) {
+            return 0;
         }
     }
 }

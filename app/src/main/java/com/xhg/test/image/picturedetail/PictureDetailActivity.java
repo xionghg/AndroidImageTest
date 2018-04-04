@@ -20,7 +20,6 @@ import com.xhg.test.image.R;
 import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
-import com.xhg.test.image.strategies.GeneratorParameter;
 import com.xhg.test.image.utils.FileUtils;
 import com.xhg.test.image.utils.Log;
 
@@ -84,7 +83,7 @@ public class PictureDetailActivity extends AppCompatActivity {
                 mStartButton.setText(R.string.button_text_start);
             }
         };
-        mGenerator = BitmapGenerator.with(new GeneratorParameter().setCallback(callback).setStrategy(mStrategy));
+        mGenerator = BitmapGenerator.with(callback).setStrategy(mStrategy);
     }
 
     @Override

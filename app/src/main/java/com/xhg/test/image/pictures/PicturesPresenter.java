@@ -7,7 +7,6 @@ import com.xhg.test.image.data.StrategyFactory;
 import com.xhg.test.image.data.source.PicturesRepository;
 import com.xhg.test.image.strategies.BitmapGenerator;
 import com.xhg.test.image.strategies.ColorStrategy;
-import com.xhg.test.image.strategies.GeneratorParameter;
 import com.xhg.test.image.utils.Log;
 
 import java.util.ArrayList;
@@ -60,14 +59,13 @@ public class PicturesPresenter implements PicturesContract.Presenter,
             for (int i = 0; i < 1/*mCurrentPictures.size()*/; i++) {
                 final int index = i;
                 Log.e(TAG, "start generator" + i);
-                BitmapGenerator generator = BitmapGenerator.with(new GeneratorParameter()
-                        .setCallback(bitmap -> {
+                BitmapGenerator generator = BitmapGenerator.with(bitmap -> {
                             mCurrentPictures.get(index).setBitmap(bitmap);
                             mPicturesView.showPictureUpdate(index, mCurrentPictures.get(index));
                         })
                         .setWidth(256)
                         .setHeight(256)
-                        .setStrategy(mCurrentPictures.get(index).getStrategy()));
+                        .setStrategy(mCurrentPictures.get(index).getStrategy());
                 mBitmapGenerators.add(generator);
             }
         }
