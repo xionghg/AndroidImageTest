@@ -2,6 +2,8 @@
 
 ### A test of Android image, where you can determine the RGB value of each pixel of a bitmap depends on your color strategy.
 
+*The idea comes from this website: [math - Tweetable Mathematical Art](https://codegolf.stackexchange.com/questions/35569/tweetable-mathematical-art)*
+
 ## How to use?
 
 ### 1、 First, initialize a BitmapGenerator.Callback.
