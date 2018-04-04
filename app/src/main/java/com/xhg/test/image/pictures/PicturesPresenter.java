@@ -56,7 +56,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
 
     public void startGenerateColor() {
         if (mBitmapGenerators.isEmpty()) {
-            for (int i = 0; i < 1/*mCurrentPictures.size()*/; i++) {
+            for (int i = 0; i < 5/*mCurrentPictures.size()*/; i++) {
                 final int index = i;
                 Log.e(TAG, "start generator" + i);
                 BitmapGenerator generator = BitmapGenerator.with(bitmap -> {
