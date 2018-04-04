@@ -17,26 +17,6 @@ package com.xhg.test.image.strategies;
  */
 
 public interface ColorStrategy {
-    /**
-     * @param x The position in horizontal
-     * @param y The position in vertical
-     * @return R values of pixel
-     */
-    int getRed(int x, int y);
-
-    /**
-     * @param x The position in horizontal
-     * @param y The position in vertical
-     * @return G values of pixel
-     */
-    int getGreen(int x, int y);
-
-    /**
-     * @param x The position in horizontal
-     * @param y The position in vertical
-     * @return B values of pixel
-     */
-    int getBlue(int x, int y);
 
     /**
      * Simple default method to invoke the three method above.
@@ -49,18 +29,6 @@ public interface ColorStrategy {
     int getRGB(int x, int y);
 
     /**
-     * Called before strategy start.
-     * Override this method if some initial operations are needed.
-     */
-    void init();
-
-    /**
-     * Called after strategy finish.
-     * Override this method if some release operations are needed.
-     */
-    void recycle();
-
-    /**
      * Set max width and height if needed.
      *
      * @param alpha
@@ -70,7 +38,12 @@ public interface ColorStrategy {
     void setParameters(int alpha, int width, int height);
 
     /**
-     *
+     * Called after strategy finish.
+     * Override this method if some release operations are needed.
+     */
+    void recycle();
+
+    /**
      * @return strategy description
      */
     String getDescription();

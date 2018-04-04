@@ -12,6 +12,10 @@ package com.xhg.test.image.strategies;
 
 public abstract class SeparateRGBColorStrategy implements ColorStrategy {
 
+    protected int WIDTH;
+    protected int HEIGHT;
+    protected int ALPHA;
+
     public abstract int getRed(int x, int y);
 
     public abstract int getGreen(int x, int y);
@@ -25,28 +29,20 @@ public abstract class SeparateRGBColorStrategy implements ColorStrategy {
      * @param y The position in vertical
      * @return RGB values of pixel
      */
-    public int getRGB(int x, int y) {
-        return ALPHA | (getRed(x, y) % 256 << 16) | (getGreen(x, y) % 256 << 8) | (getBlue(x, y) % 256);
-    }
-
     @Override
-    public void init() {
+    public final int getRGB(int x, int y) {
+        return ALPHA | (getRed(x, y) % 256 << 16) | (getGreen(x, y) % 256 << 8) | (getBlue(x, y) % 256);
     }
 
     @Override
     public void recycle() {
     }
 
-    protected int WIDTH;
-    protected int HEIGHT;
-    protected int ALPHA;
-
     @Override
     public void setParameters(int alpha, int width, int height) {
         ALPHA = alpha;
         WIDTH = width;
         HEIGHT = height;
-        init();
     }
 
     @Override

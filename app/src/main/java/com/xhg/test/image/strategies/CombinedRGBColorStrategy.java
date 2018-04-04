@@ -11,31 +11,6 @@ package com.xhg.test.image.strategies;
  */
 
 public abstract class CombinedRGBColorStrategy implements ColorStrategy {
-    @Override
-    public int getRed(int x, int y) {
-        return 0;
-    }
-
-    @Override
-    public int getGreen(int x, int y) {
-        return 0;
-    }
-
-    @Override
-    public int getBlue(int x, int y) {
-        return 0;
-    }
-
-    @Override
-    public abstract int getRGB(int x, int y);
-
-    @Override
-    public void init() {
-    }
-
-    @Override
-    public void recycle() {
-    }
 
     protected int WIDTH;
     protected int HEIGHT;
@@ -46,10 +21,13 @@ public abstract class CombinedRGBColorStrategy implements ColorStrategy {
         ALPHA = alpha;
         WIDTH = width;
         HEIGHT = height;
-        init();
     }
 
-    protected int generateRGB(int r, int g, int b) {
+    @Override
+    public void recycle() {
+    }
+
+    protected final int generateRGB(int r, int g, int b) {
         return ALPHA | (r % 256 << 16) | (g % 256 << 8) | (b % 256);
     }
 

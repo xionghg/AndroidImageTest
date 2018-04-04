@@ -66,18 +66,9 @@ public class RandomPainter extends SeparateRGBColorStrategy {
         return c[i][j];
     }
 
-    private static class Point {
-        int x;
-        int y;
-
-        Point(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
     @Override
-    public void init() {
+    public void setParameters(int alpha, int width, int height) {
+        super.setParameters(alpha, width, height);
         r = new char[WIDTH][HEIGHT];
         g = new char[WIDTH][HEIGHT];
         b = new char[WIDTH][HEIGHT];
@@ -93,5 +84,15 @@ public class RandomPainter extends SeparateRGBColorStrategy {
     @Override
     public String getDescription() {
         return "RandomPainter";
+    }
+
+    private static class Point {
+        int x;
+        int y;
+
+        Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
     }
 }

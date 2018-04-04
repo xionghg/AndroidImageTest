@@ -9,7 +9,6 @@ package com.xhg.test.image.strategies;
 
 public class Mandelbrot3 extends CombinedRGBColorStrategy {
 
-    @Override
     public int getRed(int x, int y) {
         double a = 0, b = 0, d, n = 0;
         for (; a * a + (d = b * b) < 4 && n++ < 8192; b = 2 * a * b + y / 5e4 + .06, a = a * a - d + x / 5e4 + .34)
