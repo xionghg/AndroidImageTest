@@ -22,6 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BitmapGenerator {
     public static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final int PARALLEL_COUNT = Math.max(CPU_COUNT / 2, 2);
     private static final AtomicInteger sIndex = new AtomicInteger(0);
     private final AtomicInteger mCurrentPoint = new AtomicInteger(0);
     private String mTag;
@@ -33,9 +34,8 @@ public class BitmapGenerator {
     private int mHeight = 1024;       // 高，默认1024
     private int mWidth = 1024;        // 宽，默认1024
     private ColorStrategy mStrategy;  // 颜色策略，不设置则使用默认全黑策略
+    private Callback mCallback;       // 回调，不可为空
     private int[] mColorArray;        // 颜色数组，占用内存大，使用后回收
-    // 回调，不可为空
-    private Callback mCallback;
 
     private BitmapGenerator(Callback callback) {
         mTag = "BitmapGenerator-" + sIndex.getAndIncrement();
@@ -46,65 +46,12 @@ public class BitmapGenerator {
         return new BitmapGenerator(callback);
     }
 
-    public void checkParameter() {
-        final int total = mWidth * mHeight;
-        checkNumber(total, 1, Integer.MAX_VALUE);
-        Objects.requireNonNull(mCallback);
-        if (mStrategy == null) {
-            mStrategy = new DefaultStrategy();
-        }
-        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
-    }
-
-    // get and set begin
-    public int getHeight() {
-        return mHeight;
-    }
-
-    public BitmapGenerator setHeight(int height) {
-        mHeight = checkNumber(height, 1, 10000);
-        return this;
-    }
-
-    public int getWidth() {
-        return mWidth;
-    }
-
-    public BitmapGenerator setWidth(int width) {
-        mWidth = checkNumber(width, 1, 10000);
-        return this;
-    }
-
-    public ColorStrategy getStrategy() {
-        return mStrategy;
-    }
-
-    public BitmapGenerator setStrategy(ColorStrategy strategy) {
-        mStrategy = strategy;
-        return this;
-    }
-
-    public Callback getCallback() {
-        return mCallback;
-    }
-
-    public BitmapGenerator setCallback(Callback callback) {
-        mCallback = Objects.requireNonNull(callback);
-        return this;
-    }
-
-    public BitmapGenerator setAlpha(int alpha) {
-        mAlpha = checkNumber(alpha, 1, 255) << 24;
-        return this;
-    }
-    // get and set end
-
     public void cancel() {
         if (mStatus != Status.RUNNING) {
-            Log.w(mTag, "cancel: not running, no need to cancel");
+            Log.w(mTag, "not running, no need to cancel");
             return;
         }
-        Log.d(mTag, "cancel is called");
+        Log.d(mTag, "generator is canceled");
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
@@ -130,23 +77,22 @@ public class BitmapGenerator {
             return;
         }
         mStatus = Status.RUNNING;
-        Log.d(mTag, "startGeneratePixel: cpu_count=" + CPU_COUNT + ", inParallel=" + inParallel);
-        checkParameter();
+        Log.d(mTag, "startGeneratePixel: parallel count=" + PARALLEL_COUNT + ", inParallel=" + inParallel);
+        checkParameters();
         mColorArray = new int[mWidth * mHeight];        // 开始之后才分配内存
         mCallback.onStart();
 
         mStartTime = System.currentTimeMillis();
         mCurrentPoint.set(0);
-        Flowable<Integer> flowable;
+        Flowable<Integer> flowable = Flowable.range(0, mHeight);
         if (inParallel) {
-            flowable = ParallelFlowable.from(Flowable.range(0, mHeight), 2)
+            flowable = ParallelFlowable.from(flowable, PARALLEL_COUNT)
                     .runOn(Schedulers.computation())
                     .map(this::getPixelOnLine)
                     .filter(progress -> progress > 0)
                     .sequential();
         } else {
-            flowable = Flowable.range(0, mHeight)
-                    .map(this::getPixelOnLine)
+            flowable = flowable.map(this::getPixelOnLine)
                     .filter(progress -> progress > 0)
                     .subscribeOn(Schedulers.computation());
         }
@@ -155,6 +101,15 @@ public class BitmapGenerator {
                 .subscribe(this::updateProgress,
                         this::handleError,
                         this::generatePixelFinished);
+    }
+
+    private void checkParameters() {
+        final int total = mWidth * mHeight;
+        checkNumber("width*height", total, 1, 4 * 1024 * 1024);
+        if (mStrategy == null) {
+            mStrategy = new DefaultStrategy();
+        }
+        mStrategy.setParameters(mAlpha, mWidth, mHeight);   //init() will be called in this method
     }
 
     // return progress, -1 if not yet
@@ -166,14 +121,13 @@ public class BitmapGenerator {
         int preProgress = pre * 100 / mHeight;
         int nowProgress = (pre + 1) * 100 / mHeight;
         if (nowProgress > preProgress) {
-            Log.d(mTag, "getPixelOnLine: new progress=" + nowProgress);
+            // Log.d(mTag, "getPixelOnLine: new progress=" + nowProgress);
             return nowProgress;
         }
         return -1;
     }
 
     private void updateProgress(int progress) {
-        Log.d(mTag, "updateProgress: " + progress);
         mCallback.onProgressUpdate(progress);
     }
 
@@ -185,9 +139,9 @@ public class BitmapGenerator {
         long cost = System.currentTimeMillis() - mStartTime;
         Log.d(mTag, "generate pixel finished, cost: " + cost + "ms");
         Bitmap bitmap = Bitmap.createBitmap(mColorArray, mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        mStatus = Status.FINISHED;      // set status to FINISHED before calling the callback
         mCallback.onBitmapCreated(bitmap);
         softReset();
-        mStatus = Status.FINISHED;
     }
 
     private void softReset() {
@@ -197,17 +151,57 @@ public class BitmapGenerator {
     }
 
     // 检查数据是否合理，闭区间
-    private int checkNumber(int number, int left, int right) {
+    private int checkNumber(String description, int number, int left, int right) {
         if (number < left || number > right) {
-            throw new IllegalArgumentException("params not right, should between " + left +
+            throw new IllegalArgumentException(description + " not right, should between " + left +
                     " and " + right + ", actually is " + number);
         }
         return number;
     }
 
-    /**
-     * Indicates the current status of the generator.
-     */
+    // get and set begin
+    public int getHeight() {
+        return mHeight;
+    }
+
+    public BitmapGenerator setHeight(int height) {
+        mHeight = checkNumber("height", height, 1, 10000);
+        return this;
+    }
+
+    public int getWidth() {
+        return mWidth;
+    }
+
+    public BitmapGenerator setWidth(int width) {
+        mWidth = checkNumber("width", width, 1, 10000);
+        return this;
+    }
+
+    public ColorStrategy getStrategy() {
+        return mStrategy;
+    }
+
+    public BitmapGenerator setStrategy(ColorStrategy strategy) {
+        mStrategy = strategy;
+        return this;
+    }
+
+    public Callback getCallback() {
+        return mCallback;
+    }
+
+    public BitmapGenerator setCallback(Callback callback) {
+        mCallback = Objects.requireNonNull(callback);
+        return this;
+    }
+
+    public BitmapGenerator setAlpha(int alpha) {
+        mAlpha = checkNumber("alpha", alpha, 0, 255) << 24;
+        return this;
+    }
+    // get and set end
+
     private enum Status {
         PENDING, RUNNING, FINISHED
     }
