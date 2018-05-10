@@ -43,7 +43,7 @@ public class PicturesPresenter implements PicturesContract.Presenter,
     public void start() {
         // mCurrentPictures = mPicturesRepository.getPictures();
         mCurrentPictures = new ArrayList<>();
-        ColorStrategy[] colorStrategies = StrategyFactory.getInstance().getStrategies();
+        ColorStrategy[] colorStrategies = StrategyFactory.INSTANCE.getStrategies();
         int n = 0;
         for (ColorStrategy strategy : colorStrategies) {
             Picture pic = new Picture(n++, strategy);

@@ -51,7 +51,7 @@ public class PictureDetailActivity extends AppCompatActivity {
     private void initData() {
         Log.d(TAG, "initData");
         int index = getIntent().getIntExtra(EXTRA_PICTURE_ID, 0);
-        mStrategyModel = StrategyFactory.getInstance();
+        mStrategyModel = StrategyFactory.INSTANCE;
         mStrategy = mStrategyModel.getStrategy(index);
         BitmapGenerator.Callback callback = new BitmapGenerator.Callback() {
             @Override

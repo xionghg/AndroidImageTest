@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     defaultConfig {
         applicationId "com.xhg.test.image"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -24,11 +24,12 @@ android {
     lintOptions {
         abortOnError false
     }
+    buildToolsVersion '27.0.3'
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     // compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
@@ -42,4 +43,8 @@ dependencies {
     // compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
     // compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.2-alpha-7'
     testCompile 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
