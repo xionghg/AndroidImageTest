@@ -16,9 +16,10 @@ import com.xhg.test.image.utils.Log
  * @created 2017-07-11.
  */
 
-class PicturesAdapter(private val mOnItemClickListener: OnItemClickListener) : RecyclerView.Adapter<PicturesAdapter.PicturesViewHolder>() {
+class PicturesAdapter : RecyclerView.Adapter<PicturesAdapter.PicturesViewHolder>() {
 
     private var mPictures: MutableList<Picture> = ArrayList<Picture>()
+    var onItemClickListener: (Picture) -> Unit? = {}
 
     fun replaceData(data: MutableList<Picture>) {
         this.mPictures = data
@@ -70,16 +71,12 @@ class PicturesAdapter(private val mOnItemClickListener: OnItemClickListener) : R
             holder.imageView.setImageResource(R.drawable.empty_image_150dp)
         }
         holder.textView.text = mPictures[position].strategy.description
-        holder.imageView.setOnClickListener { mOnItemClickListener.onItemClick(mPictures[position]) }
+        holder.imageView.setOnClickListener { onItemClickListener.invoke(mPictures[position]) }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PicturesViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
         return PicturesViewHolder(view)
-    }
-
-    interface OnItemClickListener {
-        fun onItemClick(picture: Picture)
     }
 
     open class PicturesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
