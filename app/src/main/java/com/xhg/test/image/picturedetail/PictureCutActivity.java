@@ -31,7 +31,7 @@ public class PictureCutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_picture_cut);
         String path = getIntent().getStringExtra("pic_path");
         initViews();
-        Bitmap bitmap = new ImageResizer().decodeSampledBitmapFromPath(path, 400, 400);
+        Bitmap bitmap =  ImageResizer.decodeSampledBitmapFromPath(path, 400, 400);
         mOriginPic.setImageBitmap(bitmap);
     }
 

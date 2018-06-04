@@ -77,7 +77,6 @@ public class ImageLoader {
     };
 
     private Context mContext;
-    private ImageResizer mImageResizer = new ImageResizer();
     private LruCache<String, Bitmap> mMemoryCache;
     private DiskLruCache mDiskLruCache;
 

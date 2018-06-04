@@ -11,8 +11,7 @@ import com.xhg.test.image.strategies.ColorStrategy
 
 class Picture(val id: Int, val strategy: ColorStrategy) {
 
-    var title: String
-        private set
+    val title: String
 
     var bitmap: Bitmap? = null
 
@@ -21,6 +20,7 @@ class Picture(val id: Int, val strategy: ColorStrategy) {
     }
 
     fun recycle() {
+        bitmap?.recycle()
         bitmap = null
     }
 }

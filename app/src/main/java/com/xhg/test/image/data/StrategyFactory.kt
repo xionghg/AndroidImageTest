@@ -14,13 +14,8 @@ import com.xhg.test.image.strategies.TableCloths
 
 object StrategyFactory {
 
-    var strategies: Array<ColorStrategy>
-        private set
-
-    init {
-        strategies = arrayOf(Mandelbrot1(), Mandelbrot2(), Mandelbrot3(), TableCloths(), RandomPainter(),
-                Mandelbrot1(), Mandelbrot2(), Mandelbrot3(), RandomPainter(), TableCloths())
-    }
+    val strategies: Array<ColorStrategy> = arrayOf(Mandelbrot1(), Mandelbrot2(), Mandelbrot3(), TableCloths(), RandomPainter(),
+            Mandelbrot1(), Mandelbrot2(), Mandelbrot3(), RandomPainter(), TableCloths())
 
     fun getStrategy(index: Int): ColorStrategy {
         return strategies[index]
