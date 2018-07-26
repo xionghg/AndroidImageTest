@@ -19,7 +19,6 @@ import com.xhg.test.image.settings.SettingsActivity
 import com.xhg.test.image.utils.Log
 import java.util.*
 
-
 /**
  * @author xionghg
  * @created 17-7-20.
@@ -90,11 +89,11 @@ class PicturesFragment : Fragment(), PicturesContract.View {
 
         recyclerView = root.findViewById<RecyclerView>(R.id.recycle_view)
         val layoutManager = GridLayoutManager(activity, 2, GridLayoutManager.VERTICAL, false)
-        //设置布局管理器
+        // 设置布局管理器
         recyclerView.layoutManager = layoutManager
-        //设置Adapter
+        // 设置Adapter
         recyclerView.adapter = recyclerAdapter
-        //设置增加或删除条目的动画
+        // 设置增加或删除条目的动画
         recyclerView.itemAnimator = DefaultItemAnimator()
         refreshLayout.setOnRefreshListener { presenter.loadPictures(false) }
 
@@ -149,7 +148,7 @@ class PicturesFragment : Fragment(), PicturesContract.View {
     }
 
     private fun showMessage(message: String) {
-        Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT).show()
+        view?.let { Snackbar.make(it, message, Snackbar.LENGTH_SHORT).show() }
     }
 
     companion object {
