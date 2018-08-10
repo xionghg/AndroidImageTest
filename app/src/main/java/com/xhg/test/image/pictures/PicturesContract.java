@@ -38,8 +38,6 @@ public interface PicturesContract {
 
         void openPictureDetails(@NonNull Picture requestedPicture);
 
-        void registerRepositoryCallBack(boolean isRegister);
-
         void cancelCurrentOperation();
 
         void startGenerateColor();

@@ -1,5 +1,7 @@
 package com.xhg.test.image.settings;
 
+import android.animation.ObjectAnimator;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;

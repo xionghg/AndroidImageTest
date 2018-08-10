@@ -42,7 +42,7 @@ class PicturesActivity : AppCompatActivity() {
         }
 
         // Create the repository
-        val repository = PicturesRepository.providePicturesRepository(applicationContext)
+        val repository = PicturesRepository.getInstance()
 
         picturesPresenter = PicturesPresenter(repository, picturesFragment as PicturesFragment)
     }

@@ -43,6 +43,7 @@ dependencies {
             dependency.glide,
             dependency.rxjava,
             dependency.rxandroid,
+            dependency.rxkotlin,
             dependency.kotlin_stdlib)
 
     // compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.2-alpha-7'

@@ -11,13 +11,9 @@ import com.xhg.test.image.strategies.ColorStrategy
 
 class Picture(val id: Int, val strategy: ColorStrategy) {
 
-    val title: String
+    val title: String = "Picture$id"
 
     var bitmap: Bitmap? = null
-
-    init {
-        title = "Picture$id"
-    }
 
     fun recycle() {
         bitmap?.recycle()

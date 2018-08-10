@@ -80,16 +80,11 @@ class PicturesAdapter : RecyclerView.Adapter<PicturesAdapter.PicturesViewHolder>
     }
 
     open class PicturesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView
-        val textView: TextView
-
-        init {
-            imageView = itemView.findViewById(R.id.image)
-            textView = itemView.findViewById(R.id.text_picture_description)
-        }
+        val imageView: ImageView = itemView.findViewById(R.id.image)
+        val textView: TextView = itemView.findViewById(R.id.text_picture_description)
     }
 
     companion object {
-        private val TAG = "MainAdapter"
+        private const val TAG = "MainAdapter"
     }
 }

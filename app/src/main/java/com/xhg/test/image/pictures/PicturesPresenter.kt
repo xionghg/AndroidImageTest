@@ -1,7 +1,6 @@
 package com.xhg.test.image.pictures
 
 import com.xhg.test.image.data.Picture
-import com.xhg.test.image.data.StrategyFactory
 import com.xhg.test.image.data.source.PicturesRepository
 import com.xhg.test.image.strategies.BitmapGenerator
 import com.xhg.test.image.utils.Log
@@ -14,9 +13,9 @@ import java.util.*
  */
 
 class PicturesPresenter(private val picturesRepository: PicturesRepository,
-                        private val picturesView: PicturesContract.View) : PicturesContract.Presenter, PicturesRepository.LoadCallback {
+                        private val picturesView: PicturesContract.View) : PicturesContract.Presenter {
 
-    private lateinit var currentPictures: MutableList<Picture>
+    private lateinit var currentPictures: List<Picture>
     private val bitmapGenerators = ArrayList<BitmapGenerator>()
 
     private var isFirstLoad: Boolean = false
@@ -26,12 +25,7 @@ class PicturesPresenter(private val picturesRepository: PicturesRepository,
     }
 
     override fun start() {
-        // currentPictures = picturesRepository.getPictures();
-        currentPictures = ArrayList()
-        val colorStrategies = StrategyFactory.strategies
-        var n = 0
-        colorStrategies.forEach { currentPictures.add(Picture(n++, it)) }
-
+        currentPictures = picturesRepository.pictures
         picturesView.showPictures(currentPictures)
         //startGenerateColor();
     }
@@ -74,18 +68,10 @@ class PicturesPresenter(private val picturesRepository: PicturesRepository,
     override fun loadPictures(forceUpdate: Boolean) {
         if (forceUpdate || isFirstLoad) {
             isFirstLoad = false
-            picturesRepository.refreshPictures()
+            //picturesRepository.refreshPictures()
         } else {
             showFilteredPictures()
             picturesView.setLoadingIndicator(false)
-        }
-    }
-
-    override fun registerRepositoryCallBack(isRegister: Boolean) {
-        if (isRegister) {
-            picturesRepository.addLoadCallback(this)
-        } else {
-            picturesRepository.removeLoadCallback(this)
         }
     }
 
@@ -106,14 +92,6 @@ class PicturesPresenter(private val picturesRepository: PicturesRepository,
     override fun openPictureDetails(requestedPicture: Picture) {
         Objects.requireNonNull(requestedPicture, "requestedPicture cannot be null!")
         picturesView.showPictureDetailsUi(requestedPicture.id)
-    }
-
-    override fun onLoadOneFinished(data: Picture) {
-
-    }
-
-    override fun onRefreshAllFinished(datas: List<Picture>) {
-
     }
 
     companion object {

@@ -32,7 +32,7 @@ class PicturesFragment : Fragment(), PicturesContract.View {
     private lateinit var recyclerView: RecyclerView
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var picturesView: RelativeLayout
-    private var toButton: Button? = null
+    private lateinit var toButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,14 +41,8 @@ class PicturesFragment : Fragment(), PicturesContract.View {
         recyclerAdapter.onItemClickListener = { presenter.openPictureDetails(it) }
     }
 
-    override fun onStart() {
-        super.onStart()
-        presenter.registerRepositoryCallBack(true)
-    }
-
     override fun onStop() {
         super.onStop()
-        presenter.registerRepositoryCallBack(false)
         presenter.cancelCurrentOperation()
     }
 
@@ -81,7 +75,7 @@ class PicturesFragment : Fragment(), PicturesContract.View {
         // Set the scrolling view in the custom SwipeRefreshLayout.
         // swipeRefreshLayout.setScrollUpChild(listView);
         toButton = root.findViewById<View>(R.id.to_button) as Button
-        toButton!!.setOnClickListener {
+        toButton.setOnClickListener {
             val intent = Intent(activity, PictureDetailActivity::class.java)
             intent.putExtra("strategy_index", 4)
             startActivity(intent)

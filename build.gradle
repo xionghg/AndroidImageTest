@@ -62,7 +62,8 @@ ext {
             canary         : "com.squareup.leakcanary:leakcanary-android:${leakcanaryVersion}",
             canary_op      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakcanaryVersion}",
             kotlin_stdlib  : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlin_version}",
-            rxandroid      : "io.reactivex.rxjava2:rxandroid:2.0.1",
-            rxjava         : "io.reactivex.rxjava2:rxjava:2.1.12"
+            rxandroid      : "io.reactivex.rxjava2:rxandroid:2.0.2",
+            rxjava         : "io.reactivex.rxjava2:rxjava:2.1.12",
+            rxkotlin       : "io.reactivex.rxjava2:rxkotlin:2.2.0"
     ]
 }
